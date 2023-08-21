@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adi-stef <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 15:51:33 by adi-stef          #+#    #+#             */
-/*   Updated: 2023/08/21 15:51:36 by adi-stef         ###   ########.fr       */
+/*   Updated: 2023/08/21 16:26:49 by adi-stef         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 #define BACKLOG 10
 #define BUFFSIZE 1000
 #define IP "10.12.3.3"
+#define RESPONSE std::string("HTTP/1.1 200 OK\nContent-Length: 88\nContent-Type: text/html\nConnection: Closed\r\n\r\n<html>\n<body>\n<h1>Hello, World!</h1>\n</body>\n</html>")
 
 int	main(void)
 {
@@ -57,6 +58,10 @@ int	main(void)
 			memset((void *) buff, 0, BUFFSIZE);
 			recv(fds[i], buff, BUFFSIZE, 0);
 			std::cout << "fds[" << i << "]: " << buff << std::endl;
+			std::cout << (send(fds[i], RESPONSE.c_str(), RESPONSE.size(), 0)) << std::endl;
+			close(fds[i]);
+			fds[i] = -1;
+			on--;
 		}
 	}
 }
