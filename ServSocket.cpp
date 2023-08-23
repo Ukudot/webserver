@@ -18,10 +18,19 @@ ServSocket::ServSocket(void) {
 }
 
 ServSocket::ServSocket(struct addrinfo addrInfo): addrInfo(addrInfo) {
+	int	on = 1;
+
 	this->sfd = socket(this->addrInfo.ai_addr->sin_family,
 			this->addrInfo.ai_socktype, this->addrInfo.ai_protocol);
 	if (this->sfd == -1)
 		throw ErrException("socket() failed");
+	if (setsockopt(this->sfd, SOL_SOCKET, SO_REUSEADDR, (char *) &on, sizeof(on)))
+		throw ErrException("setsockopt() failed");
+	if (bind(this->sfd. (struct sockaddr *) this->addrInfo.ai_addr), this->addrInfo.ai_addrlen)
+		throw ErrException("bind() failed");
+	if (listen())
+
+
 }
 
 ServSocket::~ServSocket(void) {
