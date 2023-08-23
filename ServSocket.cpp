@@ -18,7 +18,10 @@ ServSocket::ServSocket(void) {
 }
 
 ServSocket::ServSocket(struct addrinfo addrInfo): addrInfo(addrInfo) {
-	this->sfd = socket()
+	this->sfd = socket(this->addrInfo.ai_addr->sin_family,
+			this->addrInfo.ai_socktype, this->addrInfo.ai_protocol);
+	if (this->sfd == -1)
+		throw ErrException("socket() failed");
 }
 
 ServSocket::~ServSocket(void) {

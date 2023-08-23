@@ -1,5 +1,6 @@
 #pragma once
 #include "Macro.hpp"
+#include "ErrException.hpp"
 
 class ServSocket {
 	private:
