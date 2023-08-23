@@ -6,25 +6,13 @@
 /*   By: adi-stef <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 15:51:33 by adi-stef          #+#    #+#             */
-/*   Updated: 2023/08/21 15:51:36 by adi-stef         ###   ########.fr       */
+/*   Updated: 2023/08/23 12:21:07 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <string>
-#include <iostream>
-#include <cstdio>
-#include <cstdlib>
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
+#include "ServSocket.hpp"
 
-#define	PORT 8000
-#define BACKLOG 10
-#define BUFFSIZE 1000
-#define IP "10.12.3.3"
-
+/*
 int	main(void)
 {
 	struct sockaddr_in	addr;
@@ -59,4 +47,10 @@ int	main(void)
 			std::cout << "fds[" << i << "]: " << buff << std::endl;
 		}
 	}
+}
+*/
+int main(void) {
+	ServSocket	ssock;
+
+	return (0);
 }
