@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 13:54:29 by gpanico           #+#    #+#             */
-/*   Updated: 2023/08/23 15:04:25 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/08/24 11:36:37 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ Connection::Connection(int fd, struct sockaddr *addr, socklen_t addrlen): fd(fd)
 }
 
 Connection::~Connection(void) {
+	DEBUG("Connection closed");
 	if (this->fd != -1)
 		close(this->fd);
 }

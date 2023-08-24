@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 13:56:44 by gpanico           #+#    #+#             */
-/*   Updated: 2023/08/23 16:53:44 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/08/24 12:12:17 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,8 @@ ServSocket::ServSocket(struct addrinfo addrInfo): addrInfo(addrInfo) {
 	memset(this->buff, 0, BUFFSIZE);
 	memcpy((void *) addr, (void *) this->addrInfo.ai_addr, this->addrInfo.ai_addrlen);
 	this->addrInfo.ai_addr = (struct sockaddr *) addr;
+//	if (this->addrInfo.ai_socktype == SOCK_STREAM)
+//		throw ErrException("afd");
 	this->sfd = socket(((struct sockaddr_in *) this->addrInfo.ai_addr)->sin_family,
 			this->addrInfo.ai_socktype, this->addrInfo.ai_protocol);
 	if (this->sfd == -1)
@@ -61,8 +63,6 @@ ServSocket::~ServSocket(void) {
 		delete (*ite);
 	this->conns.clear();
 	delete this->addrInfo.ai_addr;
-	if (this->sfd != -1)
-		close(this->sfd);
 }
 
 ServSocket::ServSocket(ServSocket const &ssock) {
@@ -151,7 +151,9 @@ bool	ServSocket::spoll(void) {
 	Connection	*conn;
 	int			rc;
 
+	DEBUG("Polling...");
 	rc = poll(this->pollfds, this->npoll, TIMEOUT);
+//	std::cout << this->pollfds[0].revents <<std::endl;
 	if (rc == -1)
 		throw ErrException("poll() failed");
 	else if (rc == 0)
@@ -159,6 +161,7 @@ bool	ServSocket::spoll(void) {
 	if (this->pollfds[0].revents == POLLIN && this->npoll < BACKLOG)
 		this->newConn();
 	for (int i = 1; i < this->npoll; i++) {
+//		std::cout << this->pollfds[1].revents <<std::endl;
 		if (this->pollfds[i].fd == -1) {
 			this->toClean = true;
 			ERROR("fd set to -1");
@@ -175,7 +178,9 @@ bool	ServSocket::spoll(void) {
 			this->srecv(conn, i);
 		else if (this->pollfds[i].revents == POLLOUT && conn->getWriteBuff() != "")
 			this->ssend(conn, i);
-		else {
+		else if (this->pollfds[i].revents & !POLLOUT & !POLLIN) {
+			DEBUG("here");
+			std::cout << this->pollfds[i].revents <<std::endl;
 			this->toClean = true;
 			this->pollfds[i].revents = POLLERR;
 		}
@@ -191,6 +196,8 @@ bool	ServSocket::spoll(void) {
 void	ServSocket::srecv(Connection *conn, int i) {
 	int	rc;
 
+	DEBUG("Connection receiving data");
+	throw ErrException("");
 	rc = recv(conn->getFd(), this->buff, BUFFSIZE, MSG_DONTWAIT);
 	if (rc == -1)
 		throw ErrException("recv() failed");
@@ -205,6 +212,7 @@ void	ServSocket::srecv(Connection *conn, int i) {
 void	ServSocket::ssend(Connection *conn, int i) {
 	int	rc;
 
+	DEBUG("Connection sending data");
 	rc = send(conn->getFd(), conn->getWriteBuff().c_str(), conn->getWriteBuff().size(), MSG_DONTWAIT);
 	if (rc == -1)
 		throw ErrException("send() failed");
@@ -259,4 +267,8 @@ void	ServSocket::shrink(void) {
 	}
 	if (this->pollfds[this->npoll - 1].fd == -1)
 		memset((void *) &this->pollfds[--this->npoll], 0, sizeof(struct pollfd));
+}
+
+void	ServSocket::closeSfd(void) {
+	close(this->sfd);
 }

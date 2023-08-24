@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.cpp                                         :+:      :+:    :+:   */
+/*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: adi-stef <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 15:51:33 by adi-stef          #+#    #+#             */
-/*   Updated: 2023/08/23 12:21:07 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/08/24 11:11:20 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,17 @@ int	main(void)
 	}
 }
 */
-int main(void) {
-	ServSocket	ssock;
 
+int main(void) {
+	ServSocket					ssock;
+	std::vector<Connection *>	conns;
+
+	while (true) {
+		if (!ssock.spoll())
+			continue ;
+		conns = ssock.getConns(true);
+		for (size_t i = 0; i < conns.size(); i++)
+			std::cout << "Conn [" << conns[i]->getFd() << "] :" << conns[i]->getReadBuff() << std::endl;
+	}
 	return (0);
 }

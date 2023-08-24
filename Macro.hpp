@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 11:36:59 by gpanico           #+#    #+#             */
-/*   Updated: 2023/08/23 15:50:13 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/08/24 11:30:51 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 
 // utils
 #define BUFFSIZE 1000
-#define PORT 8000
+#define PORT 8123
 #define BACKLOG 10
 #define IP "10.12.3.3"
-#define TIMEOUT 1000
+#define TIMEOUT 10000
 #define NPOS std::string::npos
 
 // debug 
