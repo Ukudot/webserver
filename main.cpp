@@ -6,7 +6,7 @@
 /*   By: adi-stef <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 15:51:33 by adi-stef          #+#    #+#             */
-/*   Updated: 2023/08/24 11:11:20 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/08/24 13:47:53 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,12 @@ int main(void) {
 		if (!ssock.spoll())
 			continue ;
 		conns = ssock.getConns(true);
-		for (size_t i = 0; i < conns.size(); i++)
+		for (size_t i = 0; i < conns.size(); i++) {
 			std::cout << "Conn [" << conns[i]->getFd() << "] :" << conns[i]->getReadBuff() << std::endl;
+			conns[i]->setWriteBuff(conns[i]->getReadBuff());
+			conns[i]->setReadBuff("");
+		}
+		ssock.pushBuffers();
 	}
 	return (0);
 }

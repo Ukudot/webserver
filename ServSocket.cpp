@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 13:56:44 by gpanico           #+#    #+#             */
-/*   Updated: 2023/08/24 12:12:17 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/08/24 13:50:46 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,7 +197,7 @@ void	ServSocket::srecv(Connection *conn, int i) {
 	int	rc;
 
 	DEBUG("Connection receiving data");
-	throw ErrException("");
+	memset(this->buff, 0, BUFFSIZE);
 	rc = recv(conn->getFd(), this->buff, BUFFSIZE, MSG_DONTWAIT);
 	if (rc == -1)
 		throw ErrException("recv() failed");
@@ -222,8 +222,10 @@ void	ServSocket::ssend(Connection *conn, int i) {
 	}
 	else if (rc < (int) conn->getWriteBuff().size())
 		conn->setWriteBuff(conn->getWriteBuff().substr(rc));
-	else
+	else {
 		conn->setWriteBuff("");
+		this->pollfds[i].events = POLLIN;
+	}
 }
 
 void	ServSocket::newConn(void) {
@@ -236,7 +238,7 @@ void	ServSocket::newConn(void) {
 		throw ErrException("accept() failed");
 	conn = new Connection(this->pollfds[this->npoll].fd, connAddr, addrlen);
 	this->conns.push_back(conn);
-	this->pollfds[this->npoll].events = POLLIN | POLLOUT;
+	this->pollfds[this->npoll].events = POLLIN;
 	this->npoll++;
 	DEBUG("new connection created");
 }
@@ -271,4 +273,14 @@ void	ServSocket::shrink(void) {
 
 void	ServSocket::closeSfd(void) {
 	close(this->sfd);
+}
+
+void	ServSocket::pushBuffers(void) {
+	Connection	*conn;
+
+	for (int i = 1; i < this->npoll; i++) {
+		conn = this->getConnByFd(this->pollfds[i].fd);
+		if (conn->getWriteBuff() != "")
+			this->pollfds[i].events = POLLOUT;
+	}
 }

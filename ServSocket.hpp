@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 13:57:03 by gpanico           #+#    #+#             */
-/*   Updated: 2023/08/24 11:28:34 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/08/24 12:24:23 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,4 +63,5 @@ class ServSocket {
 		void	clean(void);
 		void	shrink(void);
 		void	closeSfd(void);
+		void	pushBuffers(void);
 };
