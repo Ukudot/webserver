@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 09:37:05 by gpanico           #+#    #+#             */
-/*   Updated: 2023/08/11 15:15:11 by adi-stef         ###   ########.fr       */
+/*   Updated: 2023/08/25 08:35:25 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <vector>
 #include <iomanip>
 #include <iostream>
+#include <ctime>
 #include "Macro.hpp"
 
 class Utils
