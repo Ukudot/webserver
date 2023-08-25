@@ -1,31 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.cpp                                         :+:      :+:    :+:   */
+/*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adi-stef <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 15:51:33 by adi-stef          #+#    #+#             */
-/*   Updated: 2023/08/21 16:26:49 by adi-stef         ###   ########.fr       */
+/*   Updated: 2023/08/24 13:59:36 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <string>
-#include <iostream>
-#include <cstdio>
-#include <cstdlib>
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
+#include "ServSocket.hpp"
 
-#define	PORT 8000
-#define BACKLOG 10
-#define BUFFSIZE 1000
-#define IP "10.12.3.3"
-#define RESPONSE std::string("HTTP/1.1 200 OK\nContent-Length: 88\nContent-Type: text/html\nConnection: Closed\r\n\r\n<html>\n<body>\n<h1>Hello, World!</h1>\n</body>\n</html>")
-
+/*
 int	main(void)
 {
 	struct sockaddr_in	addr;
@@ -58,10 +45,30 @@ int	main(void)
 			memset((void *) buff, 0, BUFFSIZE);
 			recv(fds[i], buff, BUFFSIZE, 0);
 			std::cout << "fds[" << i << "]: " << buff << std::endl;
-			std::cout << (send(fds[i], RESPONSE.c_str(), RESPONSE.size(), 0)) << std::endl;
-			close(fds[i]);
-			fds[i] = -1;
-			on--;
 		}
 	}
+}
+*/
+
+int main(void) {
+	ServSocket					ssock;
+	std::vector<Connection *>	conns;
+	bool						end = true;
+
+	while (end) {
+		if (!ssock.spoll())
+			continue ;
+		conns = ssock.getConns(true);
+		for (size_t i = 0; i < conns.size(); i++) {
+			std::cout << "Conn [" << conns[i]->getFd() << "] :" << conns[i]->getReadBuff() << std::endl;
+			if (conns[i]->getReadBuff() == "exit\n") {
+				end = false;
+				break;
+			}
+			conns[i]->setWriteBuff(conns[i]->getReadBuff());
+			conns[i]->setReadBuff("");
+		}
+		ssock.pushBuffers();
+	}
+	return (0);
 }

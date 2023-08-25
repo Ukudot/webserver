@@ -1,0 +1,6 @@
+Server.hpp
+Service.hpp
+Client.hpp
+Connection.hpp
+Request.hpp (interface or abstract)
+	Request*.hpp (for each type of request)
