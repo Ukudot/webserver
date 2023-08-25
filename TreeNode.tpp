@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/25 12:06:11 by adi-stef          #+#    #+#             */
-/*   Updated: 2023/08/25 12:30:07 by adi-stef         ###   ########.fr       */
+/*   Updated: 2023/08/25 16:57:23 by adi-stef         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,9 @@ class TreeNode {
 		std::string				name;
 		T						data;
 		std::vector<TreeNode *>	next;
+
+		// functions
+		size_t	getIndexByName(std::string name) const;
 
 	public:
 		TreeNode(std::string name, T data);
@@ -111,20 +114,56 @@ std::vector<TreeNode<T> *> const	&TreeNode<T>::getNext(void) const {
 	return (this->next);
 }
 
-template <typename T>
-TreeNode<T> const	*TreeNode<T>::search(std::string name) const {
-	
-	for (size_t i = this->next.size() / 2; this->next[i]->getName() != name;) {
-		if (name.compare(this->next[i]->getName()) > 0) {
-			if ()
-		}
-	}
+// #####################################################################################
 
-	for (size_t i = 0; i < this->next.size(); i++)
+template <typename T>
+size_t	TreeNode<T>::getIndexByName(std::string name) const {
+	int	start, end, i;
+
+	start = 0;
+	end = this->next.size() - 1;
+	while (true) {
+		i = (start + end) / 2;
 		if (this->next[i]->getName() == name)
-			return (this->next[i]);
-	
+			return (i);
+		if (i == start || i == end)
+			break ;
+		if (name.compare(this->next[i]->getName()) > 0)
+			start = i;
+		else
+			end = i;
+	}
+	return (-1);
 }
 
 template <typename T>
-void			TreeNode<T>::add(TreeNode *node);
+TreeNode<T> const	*TreeNode<T>::search(std::string name) const {
+	int	i;
+
+	i = this->getIndexByName(name);
+	if (i == -1)
+		return (NULL);
+	return (this->next[i]);
+}
+/*
+1 2 3 4 5 6 7 8 9
+*/
+template <typename T>
+void			TreeNode<T>::add(TreeNode<T> *node) {
+	int	start, end, i;
+
+	start = 0;
+	end = this->next.size() - 1;
+	while (true) {
+		i = (start + end) / 2;
+		if (this->next[i]->getName() == name)
+			return (i);
+		if (i == start || i == end)
+			break ;
+		if (name.compare(this->next[i]->getName()) > 0)
+			start = i;
+		else
+			end = i;
+	}
+	return (-1);
+}
