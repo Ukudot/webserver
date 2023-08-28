@@ -37,12 +37,25 @@ class	Tokenizer {
 		Tokenizer(Tokenizer const &tok);
 		Tokenizer	&operator=(Tokenizer const &tok);
 
+		void	tokenUrl(void);
+		void	tokenWord(void);
+		void	tokenPath(void);
+		void	tokenIp(void);
+		void	tokenInt(void);
+		void	tokenSemi(void);
+		void	tokenOpencbr(void);
+		void	tokenClosecbr(void);
+		void	tokenTokenWithValue(void);
+		void	tokenTokenWoutValue(void);
+
+		char	peek(size_t offset = 0) const;
+		char	peekSubstr(size_t offset = 0, size_t len) const;
+		char	consume(size_t offset = 0);
+
 	public:
 		Tokenizer(std::string const &buffer);
 		~Tokenizer(void);
 
-		char				peek(size_t offset = 0) const;
-		char				peekSubstr(size_t offset = 0, size_t len) const;
-		char				consume(size_t offset = 0);
+		size_t				getNoLine(void) const;
 		std::vector<token>	tokenize(void);
 };
