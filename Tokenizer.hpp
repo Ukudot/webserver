@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/28 15:35:52 by gpanico           #+#    #+#             */
-/*   Updated: 2023/08/29 10:34:32 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/08/29 11:22:28 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 #include <vector>
 #include "Optional.hpp"
 
-enum	tokenType {stm, word, path, ip, url, semi, int_lit, open_cbr, close_cbr};
+enum	tokenType {stm, word, path, ip, url, semi, int_lit, open_cbr, close_cbr, tnull};
 
 typedef struct s_token {
 	tokenType				type;

@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/28 15:35:52 by gpanico           #+#    #+#             */
-/*   Updated: 2023/08/29 10:56:27 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/08/29 11:27:30 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,9 @@ std::vector<token>	Tokenizer::tokenize(void) {
 		else if (this->peek() != 0)
 			throw (ErrException("Error: invalid charachter"));
 	}
+	this->tmpToken.type = tnull;
+	this->tmpToken.value = Optional<std::string>();
+	this->tokens.push_back(this->tmpToken);
 	return (this->tokens);
 }
 
@@ -161,5 +164,4 @@ std::string	Tokenizer::getLine(void) {
 			ss << this->peek(i);
 	}
 	return (ss.str());
-
 }
