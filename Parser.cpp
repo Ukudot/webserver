@@ -98,7 +98,7 @@ void	Parser::parserListen(void) {
 	this->consume();
 	if (this->peek().type != ip && this->peek().type != int_lit)
 		throw (ErrException("Invalid value in listen"));
-	if (this->peek().type != ip )//&& !checkIp(this->peek().value.value())) // checkIp
+	else if (this->peek().type == ip && !checkIp(this->peek().value.value())) // checkIp
 		throw (ErrException("Invalid ip format in listen"));
 	this->consume();
 	if (this->peek().type != semi)
@@ -292,4 +292,29 @@ void	Parser::parserLocation(void) {
 	}
 	if (this->peek().type == tnull)
 		throw (ErrException("Unclosed brackets in server"));
+}
+
+bool	Parser::checkIp(std::string ip) {
+	int					dot_counter = 0;
+	int					num;
+	std::stringstream	sbuff;
+
+	for (size_t i = 0; i < ip.length() ; i++) {
+		if (!std::isdigit(ip[i]) && ip[i] != '.' && ip[i] != ':')
+			return (false);
+		else if ((dot_counter < 3 && ip[i] == '.')
+				|| (dot_counter == 3 && ip[i] == ':')) {
+			num = std::atoi(sbuff.str().c_str());
+			if (sbuff.str().length() > 3 || num > 255)
+				return (false);
+			dot_counter++;
+			sbuff.str("");
+			sbuff.clear();
+		}
+		else if (std::isdigit(ip[i]))
+			sbuff << ip[i];
+		else
+			return (false);
+	}
+	return (true);
 }

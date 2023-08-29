@@ -51,6 +51,8 @@ class	Parser {
 		void	parserIndex(void);
 		void	parserAutoindex(void);
 		void	parserLocation(void);
+
+		bool	checkIp(std::string);
 	public:
 		Parser(std::vector<token> &tokens);
 		~Parser(void);
