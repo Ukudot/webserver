@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/25 12:06:11 by adi-stef          #+#    #+#             */
-/*   Updated: 2023/08/25 16:57:23 by adi-stef         ###   ########.fr       */
+/*   Updated: 2023/08/29 14:43:31 by adi-stef         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,10 @@ class TreeNode {
 	private:
 		std::string				name;
 		T						data;
-		std::vector<TreeNode *>	next;
 
 		// functions
 		size_t	getIndexByName(std::string name) const;
+		size_t	getIndexToInsert(std::string name) const;
 
 	public:
 		TreeNode(std::string name, T data);
@@ -67,6 +67,7 @@ class TreeNode {
 		// functions
 		TreeNode const	*search(std::string name) const;
 		void			add(TreeNode *node);
+		std::vector<TreeNode *>	next; // watch out
 };
 
 template <typename T>
@@ -118,7 +119,7 @@ std::vector<TreeNode<T> *> const	&TreeNode<T>::getNext(void) const {
 
 template <typename T>
 size_t	TreeNode<T>::getIndexByName(std::string name) const {
-	int	start, end, i;
+	size_t	start, end, i;
 
 	start = 0;
 	end = this->next.size() - 1;
@@ -145,19 +146,36 @@ TreeNode<T> const	*TreeNode<T>::search(std::string name) const {
 		return (NULL);
 	return (this->next[i]);
 }
+
 /*
-1 2 3 4 5 6 7 8 9
+std::cout << "before[" << i - 1 << "]: " << this->next[i - 1]->getName()
+<< " present [" << i << "]: " << this->next[i]->getName()
+<< " after[" << i + 1 << "]: " << this->next[i + 1]->getName() << std::endl;
+std::cout << "before[" << i - 1 << "]: " << name.compare(this->next[i - 1]->getName())
+<< " present [" << i << "]: " << name.compare(this->next[i]->getName())
+<< " after[" << i + 1 << "]: " << name.compare(this->next[i + 1]->getName()) << std::endl;
+std::cout << std::endl;
 */
 template <typename T>
-void			TreeNode<T>::add(TreeNode<T> *node) {
-	int	start, end, i;
+size_t	TreeNode<T>::getIndexToInsert(std::string name) const {
+	size_t	start, end, i;
 
 	start = 0;
 	end = this->next.size() - 1;
+	if (this->next.size() == 0 || name.compare(this->next[0]->getName()) < 0)
+		return (0);
+	else if (name.compare(this->next[end]->getName()) > 0)
+		return (end + 1);
 	while (true) {
 		i = (start + end) / 2;
 		if (this->next[i]->getName() == name)
 			return (i);
+		if (name.compare(this->next[i]->getName()) < 0
+				&& (i > 0 && name.compare(this->next[i - 1]->getName()) > 0))
+			return (i);
+		else if (name.compare(this->next[i]->getName()) > 0
+				&& (i < this->next.size() && name.compare(this->next[i + 1]->getName()) < 0))
+			return (i + 1);
 		if (i == start || i == end)
 			break ;
 		if (name.compare(this->next[i]->getName()) > 0)
@@ -165,5 +183,23 @@ void			TreeNode<T>::add(TreeNode<T> *node) {
 		else
 			end = i;
 	}
-	return (-1);
+	return (this->next.size() + 1);
+}
+
+template <typename T>
+void			TreeNode<T>::add(TreeNode<T> *node) {
+	size_t	index;
+
+	index = this->getIndexToInsert(node->getName());
+	if (index > this->next.size()) {
+		std::cerr << "invalid index in 'add'" << std::endl;
+		std::cerr << "trying to insert '" << node->getName() << "'" << std::endl;
+		std::cerr << "vect:";
+		for (size_t i = 0; i < this->next.size(); i++)
+			std::cerr << " " << this->next[i]->getName();
+		std::cerr << std::endl;
+		return ;
+	}
+	// si puó splittare
+	this->next.insert(this->next.begin() + index, node);
 }
