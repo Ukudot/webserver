@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/28 15:35:52 by gpanico           #+#    #+#             */
-/*   Updated: 2023/08/28 16:17:36 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/08/29 10:34:32 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 #include <vector>
 #include "Optional.hpp"
 
-enum class	tokenType {stm, word, path, ip, url, semi, int_lit, open_cbr, close_cbr};
+enum	tokenType {stm, word, path, ip, url, semi, int_lit, open_cbr, close_cbr};
 
 typedef struct s_token {
 	tokenType				type;
@@ -28,34 +28,27 @@ typedef struct s_token {
 class	Tokenizer {
 	private:
 		std::string			buffer;
-		size_t				index = 0;
+		size_t				index;
 		std::vector<token>	tokens;
 		std::stringstream	tmpValue;
 		token				tmpToken;
 		size_t				line;
+		bool				eof;
 
 		Tokenizer(Tokenizer const &tok);
 		Tokenizer	&operator=(Tokenizer const &tok);
 
-		void	tokenUrl(void);
-		void	tokenWord(void);
-		void	tokenPath(void);
-		void	tokenIp(void);
-		void	tokenInt(void);
-		void	tokenSemi(void);
-		void	tokenOpencbr(void);
-		void	tokenClosecbr(void);
-		void	tokenTokenWithValue(void);
-		void	tokenTokenWoutValue(void);
-
-		char	peek(size_t offset = 0) const;
-		char	peekSubstr(size_t offset = 0, size_t len) const;
-		char	consume(size_t offset = 0);
+		void		tokenWithValue(tokenType type);
+		void		tokenWoutValue(tokenType type);
+		char		peek(size_t offset = 0) const;
+		std::string	peekSubstr(size_t offset = 0, size_t len = 1) const;
+		char		consume(size_t offset = 0);
 
 	public:
 		Tokenizer(std::string const &buffer);
 		~Tokenizer(void);
 
 		size_t				getNoLine(void) const;
+		std::string			getLine(void);
 		std::vector<token>	tokenize(void);
 };

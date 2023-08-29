@@ -3,25 +3,24 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include "Tokenizer.hpp"
 #include "Optional.hpp"
 
-int main(int argcm, char *argv[]) {
+int main(int argc, char *argv[]) {
 	std::ifstream		ifs;
 	std::stringstream	sbuff;
 	std::string			buff;
 
-	enum class	tokenType {stm, word, path, ip, url, semi, int_lit, open_cbr, close_cbr};
 
-	struct token {
-		tokenType				type;
-		Optional<std::string>	value;
-	};
-
+	if (argc != 2) {
+		std::cerr << "Ussage error" << std::endl;
+		return (1);
+	}
 	// convert a file into a string
 	ifs.open(argv[1], std::ifstream::in);
 	if (!ifs.is_open() || !ifs.good()) {
 		std::cerr << "there was a problem with passed file" << std::endl;
-		exit(1);
+		return (1);
 	}
 	sbuff << ifs.rdbuf();
 	ifs.close();
@@ -29,6 +28,7 @@ int main(int argcm, char *argv[]) {
 	std::cout << buff << std::endl;
 
 	//tokenize
+	/*
 	std::stringstream	tmp;
 	token				tmpToken;
 	std::vector<token>	tokens;
@@ -134,7 +134,23 @@ int main(int argcm, char *argv[]) {
 	for (size_t i = 0; i < tokens.size(); i++)
 		if (tokens[i].value.hasValue())
 			std::cout << tokens[i].value.value() << std::endl;
+	*/
+	// new tokenizer
+	std::vector<token>	tokens;
+	Tokenizer			tokenizer(buff);
 
+	try {
+		tokens = tokenizer.tokenize();
+	}
+	catch (std::exception &e) {
+		std::cout << "Error at line: " << tokenizer.getNoLine() << std::endl;
+		std::cout << "line: " << tokenizer.getLine() << std::endl;
+		std::cout << e.what() << std::endl;
+	}
+	for (size_t i = 0; i < tokens.size(); i++ )
+		if (tokens[i].value.hasValue())
+			std::cout << tokens[i].value.value() << std::endl;
+/*
 	// parser
 
 	for (size_t i = 0; i < tokens.size(); i++) {
@@ -197,5 +213,6 @@ int main(int argcm, char *argv[]) {
 			i++;
 		}
 	}
+	*/
 	return (0);
 }

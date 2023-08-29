@@ -8,7 +8,7 @@ server
     upload                  /home/user42/Bureau/webserv/www/uploads;
     cgi                     php  php-cgi_ubuntu;
     cgi                     test ubuntu_cgi_tester;
-    cgi-bin                 /home/user42/Bureau/webserv/cgi-bin; 
+    cgi-bin                 /home/user42/Bureau/webserv/cgi-bin;
     client_max_body_size    30;
     allow_methods           GET POST;
     index                   index.html;
