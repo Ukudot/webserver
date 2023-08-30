@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/25 12:06:11 by adi-stef          #+#    #+#             */
-/*   Updated: 2023/08/30 12:21:25 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/08/30 15:31:24 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,6 +124,8 @@ size_t	TreeNode<T>::getIndexByName(std::string name) const {
 
 	start = 0;
 	end = this->next.size() - 1;
+	if (name == this->next[end]->getName())
+		return (end);
 	while (true) {
 		i = (start + end) / 2;
 		if (this->next[i]->getName() == name)

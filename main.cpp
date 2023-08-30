@@ -6,12 +6,13 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 15:51:33 by adi-stef          #+#    #+#             */
-/*   Updated: 2023/08/29 14:24:14 by adi-stef         ###   ########.fr       */
+/*   Updated: 2023/08/30 15:25:51 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ServSocket.hpp"
-#include "TreeNode.tpp"
+#include "TreeNode.hpp"
+#include "Tree.hpp"
 
 /*
 int	main(void)
@@ -71,19 +72,43 @@ int main(void) {
 	// 	}
 	// 	ssock.pushBuffers();
 	// }
-	TreeNode<int>	node("base", 0);
+	TreeNode<int>	*node;
+	TreeNode<int>	*node2;
+	TreeNode<int>	*node3;
+	TreeNode<int>	*node4;
 
-	node.add(new TreeNode<int>("H", 0));
-	node.add(new TreeNode<int>("A", 0));
-	node.add(new TreeNode<int>("E", 0));
-	node.add(new TreeNode<int>("B", 0));
-	node.add(new TreeNode<int>("F", 0));
-	node.add(new TreeNode<int>("C", 0));
-	node.add(new TreeNode<int>("G", 0));
-	node.add(new TreeNode<int>("D", 0));
+	node = new TreeNode<int>("base", 0);
+	node2 = new TreeNode<int>("2level", 0);
+	node3 = new TreeNode<int>("2level-par", 0);
+	node4 = new TreeNode<int>("3level", 0);
 
-	for (int i = 0; i < 8; i++)
-		std::cout << node.next[i]->getName() << std::endl;
+	node->add(new TreeNode<int>("H", 0));
+	node->add(new TreeNode<int>("A", 0));
+	node->add(new TreeNode<int>("E", 0));
+	node->add(node2);
+	node->add(node3);
+	node2->add(new TreeNode<int>("B", 0));
+	node2->add(new TreeNode<int>("F", 0));
+	node2->add(new TreeNode<int>("C", 0));
+	node3->add(new TreeNode<int>("G", 0));
+	node3->add(new TreeNode<int>("D", 0));
+	node2->add(node4);
+	node4->add(new TreeNode<int>("Z", 0));
+	node4->add(new TreeNode<int>("Y", 0));
 
+//	for (int i = 0; i < 8; i++)
+//		std::cout << node.next[i]->getName() << std::endl;
+	
+	Tree<int>	tree(node);
+	tree.print(NULL, "root");
+	std::vector<std::string>	names = {"2level", "3level", "Z"};
+	TreeNode<int> const	*search = tree.getNode(names);
+	std::cout << search->getName() << std::endl;
+	names.erase(names.begin() + 1);
+	search = tree.getNode(names);
+	if (!search)
+		std::cout << "funziona" << std::endl;
+	else
+		std::cout << "non funziona" << std::endl;
 	return (0);
 }
