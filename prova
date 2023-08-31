@@ -68,22 +68,21 @@ server
     location    /myhome {
         autoindex           on;
         prohibit_methods    POST;
-        alias               /home;
     }
 
     location /1 {
         error_page 404 /errors/404sp2.html;
+	}
 
-        location /2 {
-            error_page 404 /errors/404sp3.html;
+	location /2 {
+		error_page 404 /errors/404sp3.html;
+	}
 
-            location /3 {
-                error_page 404 /errors/404sp4.html;
+	location /3 {
+		error_page 404 /errors/404sp4.html;
+	}
 
-                location /4 {
-                    error_page 404 /errors/404sp5.html;
-                }
-            }
-        }
-    }
+	location /4 {
+		error_page 404 /errors/404sp5.html;
+	}
 }

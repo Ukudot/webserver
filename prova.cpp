@@ -6,6 +6,8 @@
 #include "Tokenizer.hpp"
 #include "Optional.hpp"
 #include "Parser.hpp"
+#include "TreeNode.hpp"
+#include "Tree.hpp"
 
 int main(int argc, char *argv[]) {
 	std::ifstream		ifs;
@@ -43,17 +45,25 @@ int main(int argc, char *argv[]) {
 
 	// new parser
 	Parser	parser(tokens);
+	std::vector<TreeNode<t_node> *>	nodes;
+	Tree<t_node>					*tree;
 
-//	try {
-		parser.parse();
-//	}
-//	catch (std::exception &e){
-//		std::cout << e.what() << std::endl;
-//	}
+	try {
+		nodes = parser.parse();
+	}
+	catch (std::exception &e){
+		std::cout << e.what() << std::endl;
+	}
 
-//	for (size_t i = 0; i < tokens.size(); i++ )
-//		if (tokens[i].value.hasValue())
-//			std::cout << tokens[i].value.value() << std::endl;
+	for (size_t i = 0; i < tokens.size(); i++ )
+		if (tokens[i].value.hasValue())
+			std::cout << tokens[i].value.value() << std::endl;
+
+	for (size_t i = 0; i < nodes.size(); i++) {
+		tree = new Tree<t_node>(nodes[i]);
+		tree->print(NULL, "server");
+		delete (tree);
+	}
 
 	return (0);
 }

@@ -78,7 +78,6 @@ std::vector<TreeNode<t_node> *>	Parser::parse(void) {
 		data = empty;
 		this->nodes.push_back(new TreeNode<t_node>());
 		while (this->peek().type != tnull && this->peek().type != close_cbr) {
-			std::cout << "DEBUG>> " << this->peek().value.value() << std::endl;
 			if (this->peek().type != word)
 				throw (ErrException("Invalid statement in server"));
 			(this->*(this->parsers.at(this->peek().value.value())))(data);

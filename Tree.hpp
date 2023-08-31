@@ -87,8 +87,10 @@ template <typename T>
 void	Tree<T>::print(TreeNode<T> *node, std::string const &name) const {
 	std::vector<TreeNode<T> *>	nodes;
 
-	if (!node)
+	if (!node) {
 		node = this->root;
+		this->root->setName(name);
+	}
 	nodes = node->getNext();
 	for (size_t i = 0; i < nodes.size(); i++)
 		this->print(nodes[i], node->getName());
