@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 10:59:46 by gpanico           #+#    #+#             */
-/*   Updated: 2023/08/29 16:52:36 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/08/31 16:55:24 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,9 @@ Parser::Parser(std::vector<token> &tokens): tokens(tokens) {
 	this->parsers["listen"] = &Parser::parserListen;
 	this->parsers["root"] = &Parser::parserRoot;
 	this->parsers["upload"] = &Parser::parserUpload;
-	this->parsers["err_page"] = &Parser::parserErrPage;
-	this->parsers["max_body_size"] = &Parser::parserMaxBody;
-	this->parsers["methods"] = &Parser::parserMethods;
+	this->parsers["error_page"] = &Parser::parserErrPage;
+	this->parsers["client_max_body_size"] = &Parser::parserMaxBody;
+	this->parsers["allow_methods"] = &Parser::parserMethods;
 	this->parsers["prohibit_methods"] = &Parser::parserPrMethods;
 	this->parsers["rewrite"] = &Parser::parserRewrite;
 	this->parsers["cgi"] = &Parser::parserCgi;
@@ -32,7 +32,6 @@ Parser::Parser(std::vector<token> &tokens): tokens(tokens) {
 }
 
 Parser::~Parser(void) {
-	return ;
 }
 
 Parser::Parser(Parser const &par) {
@@ -45,6 +44,7 @@ Parser	&Parser::operator=(Parser const &par) {
 	this->tokens = par.tokens;
 	this->index = par.index;
 	this->end = par.end;
+	this->nodes = par.nodes;
 	return (*this);
 }
 
@@ -64,7 +64,9 @@ token	Parser::consume(size_t offset) {
 }
 
 
-void	Parser::parse(void) {
+std::vector<TreeNode<t_node> *>	Parser::parse(void) {
+	t_node data, empty;
+	
 	while (this->peek().type != tnull) {
 		if (!this->peek().value.hasValue()
 				|| this->peek().value.value() != "server"
@@ -73,108 +75,117 @@ void	Parser::parse(void) {
 		this->consume(1);
 		if (this->peek().type == close_cbr)
 			throw (ErrException("Empty server"));
+		data = empty;
+		this->nodes.push_back(new TreeNode<t_node>());
 		while (this->peek().type != tnull && this->peek().type != close_cbr) {
+			std::cout << "DEBUG>> " << this->peek().value.value() << std::endl;
 			if (this->peek().type != word)
 				throw (ErrException("Invalid statement in server"));
-			(this->*(this->parsers.at(this->peek().value.value())))();
+			(this->*(this->parsers.at(this->peek().value.value())))(data);
 		}
 		if (this->peek().type == tnull)
 			throw (ErrException("Unclosed brackets in server"));
+		this->nodes.back()->setData(data);
+		this->consume();
 	}
+	return (this->nodes);
 }
 
-void	Parser::parserSname(void) {
+void	Parser::parserSname(t_node &data) {
 	this->consume();
 	if (this->peek().type != word)
 		throw (ErrException("Missing value in server_name"));
 	while (this->peek().type == word)
-		this->consume();
+		data.servNames.push_back(this->consume().value.value());
 	if (this->peek().type != semi)
 		throw (ErrException("Missing ';' after server_name"));
 	this->consume();
 };
 
-void	Parser::parserListen(void) {
+void	Parser::parserListen(t_node &data) {
+	std::string	value;
+
 	this->consume();
 	if (this->peek().type != ip && this->peek().type != int_lit)
 		throw (ErrException("Invalid value in listen"));
-	else if (this->peek().type == ip && !checkIp(this->peek().value.value())) // checkIp
+	else if (this->peek().type == ip && !checkIp(this->peek().value.value()))
 		throw (ErrException("Invalid ip format in listen"));
+	value = this->peek().value.value();
+	if (this->peek().type == int_lit)
+		data.port = std::atoi(value.c_str());
+	else {
+		data.host = value.substr(0, value.find(':'));
+		data.port = std::atoi(value.substr(value.find(':') + 1).c_str());
+	}
 	this->consume();
 	if (this->peek().type != semi)
 		throw (ErrException("Missing ';' after listen"));
 	this->consume();
 }
 
-void	Parser::parserRoot(void) {
-	std::ofstream	test;
-
+void	Parser::parserRoot(t_node &data) {
 	this->consume();
 	if (this->peek().type != path)
 		throw (ErrException("Invalid path in root"));
-	test.open((this->peek().value.value() + std::string("/.test")).c_str(), std::ofstream::out);
-	if (!test.is_open())
-		throw (ErrException("Invalid path in root"));
-	remove((this->peek().value.value() + std::string("/.test")).c_str());
-	this->consume();
+	data.root = this->consume().value.value();
 	if (this->peek().type != semi)
 		throw (ErrException("Missing ';' after root"));
 	this->consume();
 }
 
-void	Parser::parserUpload(void) {
-	std::ofstream	test;
-
+void	Parser::parserUpload(t_node &data) {
 	this->consume();
 	if (this->peek().type != path)
 		throw (ErrException("Invalid path in upload"));
-	test.open((this->peek().value.value() + std::string("/.test")).c_str(), std::ofstream::out);
-	if (!test.is_open())
-		throw (ErrException("Invalid path in upload"));
-	remove((this->peek().value.value() + std::string("/.test")).c_str());
-	this->consume();
+	data.upload = this->consume().value.value();
 	if (this->peek().type != semi)
 		throw (ErrException("Missing ';' after upload"));
 	this->consume();
 }
 
-void	Parser::parserErrPage(void) {
-	std::ifstream	test;
+void	Parser::parserErrPage(t_node &data) {
+	int	code;
 
 	this->consume();
 	if (this->peek().type != int_lit
-			|| std::atoi(this->peek().value.value().c_str()) > 499
+			|| std::atoi(this->peek().value.value().c_str()) > 599
 			|| std::atoi(this->peek().value.value().c_str()) < 400)
 		throw (ErrException("Invalid error_code in err_page"));
-	this->consume();
-	if (this->peek().type != path) // il controllo del path verrá fatto successivamente
+	code = std::atoi(this->consume().value.value().c_str());
+	if (this->peek().type != path)
 		throw (ErrException("Invalid path in err_page"));
-	this->consume();
+	data.errPages[code] = this->consume().value.value();
 	if (this->peek().type != semi)
 		throw (ErrException("Missing ';' after err_page"));
 	this->consume();
 }
 
-void	Parser::parserMaxBody(void) {
+void	Parser::parserMaxBody(t_node &data) {
 	this->consume();
 	if (this->peek().type != int_lit
 			|| this->peek().value.value().length() >= 10)
 		throw (ErrException("Invalid size in max_body_size"));
-	this->consume();
+	data.maxBodySize = std::atoi(this->consume().value.value().c_str());
 	if (this->peek().type != semi)
 		throw (ErrException("Missing ';' after max_body_size"));
 	this->consume();
 }
 
-void	Parser::parserMethods(void) {
+void	Parser::parserMethods(t_node &data) {
 	std::string	value;
 
 	this->consume();
 	if (this->peek().type != word)
 		throw (ErrException("Invalid method in methods"));
-	while (this->peek().type != word) {
+	while (this->peek().type == word) {
 		value = this->consume().value.value();
-		if (value != "GET" && value != "POST" && value != "DELETE")
+		if (value == "GET")
+			data.methods |= 1;
+		else if (value == "POST")
+			data.methods |= 2;
+		else if (value == "DELETE")
+			data.methods |= 4;
+		else
 			throw (ErrException("Unknown method in methods"));
 	}
 	if (this->peek().type != semi)
@@ -182,44 +193,53 @@ void	Parser::parserMethods(void) {
 	this->consume();
 }
 
-void	Parser::parserPrMethods(void) {
+void	Parser::parserPrMethods(t_node &data) {
 	std::string	value;
 
 	this->consume();
 	if (this->peek().type != word)
 		throw (ErrException("Invalid method in prohibit_methods"));
-	while (this->peek().type != word) {
+	while (this->peek().type == word) {
 		value = this->consume().value.value();
-		if (value != "GET" && value != "POST" && value != "DELETE")
-			throw (ErrException("Unknown method in prohibit_methods"));
+		if (value == "GET")
+			data.methods &= ~1;
+		else if (value == "POST")
+			data.methods &= ~2;
+		else if (value == "DELETE")
+			data.methods &= ~4;
+		else
+			throw (ErrException("Unknown method in methods"));
 	}
 	if (this->peek().type != semi)
 		throw (ErrException("Missing ';' after prohibit_methods"));
 	this->consume();
 }
 
-void	Parser::parserRewrite(void) {
-	std::ifstream	test;
+void	Parser::parserRewrite(t_node &data) {
+	t_redirect		red;
 	std::string		value;
 
 	this->consume();
-	if (this->peek().type != path) // il controllo del path verrá fatto successivamente
+	if (this->peek().type != path)
 		throw (ErrException("Invalid path in rewrite"));
-	this->consume();
-	if (this->peek().type != path && this->peek().type != url) // il controllo del path verrá fatto successivamente
+	red.src = this->consume().value.value();
+	if (this->peek().type != path && this->peek().type != url)
 		throw (ErrException("Invalid param in rewrite"));
-	this->consume();
+	red.dst = this->consume().value.value();
 	if (this->peek().type != word)
 		throw (ErrException("Invalid method in prohibit_methods"));
 	value = this->consume().value.value();
 	if (value != "permanent" && value != "redirect")
 		throw (ErrException("Unkonwn mode in prohibit_methods"));
+	red.type = value.at(0);
 	if (this->peek().type != semi)
 		throw (ErrException("Missing ';' after rewrite"));
 	this->consume();
+	data.redirections.push_back(red);
 }
 
-void	Parser::parserCgi(void) {
+void	Parser::parserCgi(t_node &data) {
+	t_cgi		cgi;
 	std::string	value;
 
 	this->consume();
@@ -228,70 +248,75 @@ void	Parser::parserCgi(void) {
 	value = this->consume().value.value();
 	if (value != "python" && value != "exe" && value != "bash" && value != "php")
 		throw (ErrException("Unknown type in cgi"));
-	if (this->peek().type != word) // il controllo del path verrá fatto successivamente
+	cgi.type = value;
+	if (this->peek().type != word)
 		throw (ErrException("Invalid param in cgi"));
-	this->consume();
+	cgi.eName = this->consume().value.value();
 	if (this->peek().type != semi)
 		throw (ErrException("Missing ';' after cgi"));
 	this->consume();
+	data.cgis.push_back(cgi);
 }
 
-void	Parser::parserCgiBin(void) {
-	std::ofstream	test;
-
+void	Parser::parserCgiBin(t_node &data) {
 	this->consume();
 	if (this->peek().type != path)
 		throw (ErrException("Invalid path in cgi-bin"));
-	test.open((this->peek().value.value() + std::string("/.test")).c_str(), std::ofstream::out);
-	if (!test.is_open())
-		throw (ErrException("Invalid path in cgi-bin"));
-	remove((this->peek().value.value() + std::string("/.test")).c_str());
-	this->consume();
+	data.cgiBin = this->consume().value.value();
 	if (this->peek().type != semi)
 		throw (ErrException("Missing ';' after cgi-bin"));
 	this->consume();
 }
 
-void	Parser::parserIndex(void) {
+void	Parser::parserIndex(t_node &data) {
 	this->consume();
-	if (this->peek().type != word) // il controllo del path verrá fatto successivamente
+	if (this->peek().type != word)
 		throw (ErrException("Invalid param in index"));
-	this->consume();
+	while (this->peek().type == word)
+		data.index.push_back(this->consume().value.value());
 	if (this->peek().type != semi)
 		throw (ErrException("Missing ';' after index"));
 	this->consume();
 }
 
-void	Parser::parserAutoindex(void) {
+void	Parser::parserAutoindex(t_node &data) {
 	std::string	value;
 
 	this->consume();
-	if (this->peek().type != word) // il controllo del path verrá fatto successivamente
+	if (this->peek().type != word)
 		throw (ErrException("Invalid param in autoindex"));
 	value = this->consume().value.value();
-	if (value != "on" || value != "off")
+	if (value != "on" && value != "off")
 		throw (ErrException("Unknown mode in autoindex"));
-	value = this->consume().value.value();
+	data.autoindex = (value == "on") ? true : false;
 	if (this->peek().type != semi)
 		throw (ErrException("Missing ';' after autoindex"));
 	this->consume();
 }
 
-void	Parser::parserLocation(void) {
+void	Parser::parserLocation(t_node &data) {
+	std::string			value;
+
+	(void) data;
 	this->consume();
-	if (this->peek().type != path // il controllo del path verrá fatto successivamente
+	if (this->peek().type != path
 			|| this->peek(1).type != open_cbr)
 		throw (ErrException("Missing '{' after location"));
-	this->consume(1);
+	value = this->consume().value.value();
+	this->consume();
 	if (this->peek().type == close_cbr)
 		throw (ErrException("Empty location"));
+	t_node data_location;
+	this->nodes.back()->add(new TreeNode<t_node>(value, data_location));
 	while (this->peek().type != tnull && this->peek().type != close_cbr) {
-		if (this->peek().type != word)
+		if (this->peek().type != word || this->peek().value.value() == "location")
 			throw (ErrException("Invalid statement in location"));
-		(this->*(this->parsers.at(this->peek().value.value())))();
+		(this->*(this->parsers.at(this->peek().value.value())))(data_location);
 	}
 	if (this->peek().type == tnull)
-		throw (ErrException("Unclosed brackets in server"));
+		throw (ErrException("Unclosed brackets in location"));
+	this->consume();
+	this->nodes.back()->setData(data_location);
 }
 
 bool	Parser::checkIp(std::string ip) {

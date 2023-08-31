@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/25 12:06:11 by adi-stef          #+#    #+#             */
-/*   Updated: 2023/08/30 15:31:24 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/08/31 16:27:15 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,21 @@
 typedef struct s_cgi {
 	std::string	type;
 	std::string	eName;
+	s_cgi(void) {
+		type = "";
+		eName = "";
+	}
 }	t_cgi;
 
 typedef struct s_redirect {
 	std::string	src;
 	std::string	dst;
 	char		type;
+	s_redirect(void) {
+		src = "";
+		dst = "";
+		type = 0;
+	}
 }	t_redirect;
 
 typedef struct s_node {
@@ -42,6 +51,16 @@ typedef struct s_node {
 	std::vector<t_redirect>		redirections;
 	std::vector<t_cgi>			cgis;
 	std::string					cgiBin;
+	s_node(void) {
+		host = "127.0.0.1";
+		port = 0;
+		root = "";
+		maxBodySize = 0;
+		methods = 0;
+		upload = "";
+		autoindex = false;
+		cgiBin = "";
+	}
 }	t_node;
 
 template <typename T>
@@ -56,6 +75,7 @@ class TreeNode {
 		size_t	getIndexToInsert(std::string name) const;
 
 	public:
+		TreeNode(void);
 		TreeNode(std::string name, T data);
 		~TreeNode(void);
 		TreeNode(TreeNode const &trn);
@@ -66,10 +86,19 @@ class TreeNode {
 		T const							&getData(void) const;
 		std::vector<TreeNode *> const	&getNext(void) const;
 
+		// setters
+		void	setName(std::string name);
+		void	setData(T data);
+
 		// functions
 		TreeNode const	*search(std::string name) const;
 		void			add(TreeNode *node);
 };
+
+template <typename T>
+TreeNode<T>::TreeNode(void) {
+	return ;
+}
 
 template <typename T>
 TreeNode<T>::TreeNode(std::string name, T data): name(name), data(data) {
@@ -114,6 +143,16 @@ T const							&TreeNode<T>::getData(void) const {
 template <typename T>
 std::vector<TreeNode<T> *> const	&TreeNode<T>::getNext(void) const {
 	return (this->next);
+}
+
+template <typename T>
+void				TreeNode<T>::setName(std::string name) {
+	this->name = name;
+}
+
+template <typename T>
+void				TreeNode<T>::setData(T data) {
+	this->data = data;
 }
 
 // #####################################################################################
