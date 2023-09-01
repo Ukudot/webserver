@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 13:56:44 by gpanico           #+#    #+#             */
-/*   Updated: 2023/08/24 13:50:46 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/08/30 15:57:32 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,8 +179,7 @@ bool	ServSocket::spoll(void) {
 		else if (this->pollfds[i].revents == POLLOUT && conn->getWriteBuff() != "")
 			this->ssend(conn, i);
 		else if (this->pollfds[i].revents & !POLLOUT & !POLLIN) {
-			DEBUG("here");
-			std::cout << this->pollfds[i].revents <<std::endl;
+//			std::cout << this->pollfds[i].revents <<std::endl;
 			this->toClean = true;
 			this->pollfds[i].revents = POLLERR;
 		}

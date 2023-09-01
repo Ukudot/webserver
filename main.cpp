@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 15:51:33 by adi-stef          #+#    #+#             */
-/*   Updated: 2023/08/30 15:25:51 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/08/30 15:58:45 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,62 +53,63 @@ int	main(void)
 */
 
 int main(void) {
-	// ServSocket					ssock;
-	// std::vector<Connection *>	conns;
-	// bool						end = true;
+	ServSocket					ssock;
+	std::vector<Connection *>	conns;
+	bool						end = true;
 
-	// while (end) {
-	// 	if (!ssock.spoll())
-	// 		continue ;
-	// 	conns = ssock.getConns(true);
-	// 	for (size_t i = 0; i < conns.size(); i++) {
-	// 		std::cout << "Conn [" << conns[i]->getFd() << "] :" << conns[i]->getReadBuff() << std::endl;
-	// 		if (conns[i]->getReadBuff() == "exit\n") {
-	// 			end = false;
-	// 			break;
-	// 		}
-	// 		conns[i]->setWriteBuff(conns[i]->getReadBuff());
-	// 		conns[i]->setReadBuff("");
-	// 	}
-	// 	ssock.pushBuffers();
-	// }
-	TreeNode<int>	*node;
-	TreeNode<int>	*node2;
-	TreeNode<int>	*node3;
-	TreeNode<int>	*node4;
+	while (end) {
+		if (!ssock.spoll())
+			continue ;
+		conns = ssock.getConns(true);
+		for (size_t i = 0; i < conns.size(); i++) {
+			std::cout << "Conn [" << conns[i]->getFd() << "] :" << conns[i]->getReadBuff() << std::endl;
+			if (conns[i]->getReadBuff() == "exit\n") {
+				end = false;
+				break;
+			}
+			conns[i]->setWriteBuff(conns[i]->getReadBuff());
+			conns[i]->setReadBuff("");
+		}
+		ssock.pushBuffers();
+	}
+	ssock.closeSfd();
+//	TreeNode<int>	*node;
+//	TreeNode<int>	*node2;
+//	TreeNode<int>	*node3;
+//	TreeNode<int>	*node4;
 
-	node = new TreeNode<int>("base", 0);
-	node2 = new TreeNode<int>("2level", 0);
-	node3 = new TreeNode<int>("2level-par", 0);
-	node4 = new TreeNode<int>("3level", 0);
+//	node = new TreeNode<int>("base", 0);
+//	node2 = new TreeNode<int>("2level", 0);
+//	node3 = new TreeNode<int>("2level-par", 0);
+//	node4 = new TreeNode<int>("3level", 0);
 
-	node->add(new TreeNode<int>("H", 0));
-	node->add(new TreeNode<int>("A", 0));
-	node->add(new TreeNode<int>("E", 0));
-	node->add(node2);
-	node->add(node3);
-	node2->add(new TreeNode<int>("B", 0));
-	node2->add(new TreeNode<int>("F", 0));
-	node2->add(new TreeNode<int>("C", 0));
-	node3->add(new TreeNode<int>("G", 0));
-	node3->add(new TreeNode<int>("D", 0));
-	node2->add(node4);
-	node4->add(new TreeNode<int>("Z", 0));
-	node4->add(new TreeNode<int>("Y", 0));
+//	node->add(new TreeNode<int>("H", 0));
+//	node->add(new TreeNode<int>("A", 0));
+//	node->add(new TreeNode<int>("E", 0));
+//	node->add(node2);
+//	node->add(node3);
+//	node2->add(new TreeNode<int>("B", 0));
+//	node2->add(new TreeNode<int>("F", 0));
+//	node2->add(new TreeNode<int>("C", 0));
+//	node3->add(new TreeNode<int>("G", 0));
+//	node3->add(new TreeNode<int>("D", 0));
+//	node2->add(node4);
+//	node4->add(new TreeNode<int>("Z", 0));
+//	node4->add(new TreeNode<int>("Y", 0));
 
 //	for (int i = 0; i < 8; i++)
 //		std::cout << node.next[i]->getName() << std::endl;
 	
-	Tree<int>	tree(node);
-	tree.print(NULL, "root");
-	std::vector<std::string>	names = {"2level", "3level", "Z"};
-	TreeNode<int> const	*search = tree.getNode(names);
-	std::cout << search->getName() << std::endl;
-	names.erase(names.begin() + 1);
-	search = tree.getNode(names);
-	if (!search)
-		std::cout << "funziona" << std::endl;
-	else
-		std::cout << "non funziona" << std::endl;
+//	Tree<int>	tree(node);
+//	tree.print(NULL, "root");
+//	std::vector<std::string>	names = {"2level", "3level", "Z"};
+//	TreeNode<int> const	*search = tree.getNode(names);
+//	std::cout << search->getName() << std::endl;
+//	names.erase(names.begin() + 1);
+//	search = tree.getNode(names);
+//	if (!search)
+//		std::cout << "funziona" << std::endl;
+//	else
+//		std::cout << "non funziona" << std::endl;
 	return (0);
 }
