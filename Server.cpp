@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 10:05:23 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/04 15:34:25 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/04 16:51:41 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ void	Server::interpret(void) {
 	std::vector<Connection *>			conns;
 	std::string							request;
 
+
 	for (ite = this->sockets.begin(); ite != this->socket.end(); ite++) {
 		if (!(*ite)->spoll())
 			continue ;
@@ -62,7 +63,8 @@ void	Server::interpret(void) {
 		for (iteCon = conns.begin(); iteCon != conns.end(); iteCon++) {
 			request = this->readConn((*iteCon)); // todo
 			if (request == "")
-				continue;
+				continue ;
+
 			this->writeConn(*iteConn, request); // todo
 		}
 	}
