@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 13:57:03 by gpanico           #+#    #+#             */
-/*   Updated: 2023/08/24 12:24:23 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/04 11:43:47 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ class ServSocket {
 		void	newConn(void);
 		
 	public:
-		ServSocket(void);
+		ServSocket(std::string ip = "127.0.0.1", int port = 80);
 		ServSocket(struct addrinfo addrInfo);
 		~ServSocket(void);
 		ServSocket(ServSocket const &ssock);

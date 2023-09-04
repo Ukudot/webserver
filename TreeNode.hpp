@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/25 12:06:11 by adi-stef          #+#    #+#             */
-/*   Updated: 2023/08/31 16:27:15 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/04 10:43:55 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,7 @@ typedef struct s_redirect {
 
 typedef struct s_node {
 	std::vector<std::string>	servNames;
-	std::string					host;
-	int							port;
+	std::map<int, std::string>	ports;
 	std::string					root;
 	std::map<int, std::string>	errPages;
 	int							maxBodySize;
@@ -52,8 +51,6 @@ typedef struct s_node {
 	std::vector<t_cgi>			cgis;
 	std::string					cgiBin;
 	s_node(void) {
-		host = "127.0.0.1";
-		port = 0;
 		root = "";
 		maxBodySize = 0;
 		methods = 0;

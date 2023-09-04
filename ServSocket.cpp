@@ -6,19 +6,16 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 13:56:44 by gpanico           #+#    #+#             */
-/*   Updated: 2023/08/30 15:57:32 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/04 14:17:02 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ServSocket.hpp"
 
-ServSocket::ServSocket(void) {
-	struct sockaddr_in	*addr = new struct sockaddr_in;
+ServSocket::ServSocket(std::string ip, int port) {
+	struct addrinfo	*addr;
 
 	this->sfd = -1;
-	addr->sin_family = AF_INET;
-	addr->sin_addr.s_addr = INADDR_ANY;
-	addr->sin_port = htons(PORT);
 	this->addrInfo.ai_flags = AI_PASSIVE;
 	this->addrInfo.ai_family = AF_UNSPEC;
 	this->addrInfo.ai_socktype = SOCK_STREAM;
@@ -27,6 +24,11 @@ ServSocket::ServSocket(void) {
 	this->addrInfo.ai_canonname = NULL;
 	this->addrInfo.ai_addr = (struct sockaddr *) addr;
 	this->addrInfo.ai_next = NULL;
+	if (getaddrinfo(ip.c_str(), Utils::ft_itoa(port).c_str(), &this->addrInfo, &addr))
+		throw (ErrException("getaddrinfo() failed"));
+	memcpy((void *) &this->addrInfo, (void *) addr, sizeof(struct addrinfo));
+	this->addrInfo.ai_next = NULL;
+	freeaddrinfo(addr);
 	*this = ServSocket(this->addrInfo);
 }
 
@@ -37,8 +39,6 @@ ServSocket::ServSocket(struct addrinfo addrInfo): addrInfo(addrInfo) {
 	memset(this->buff, 0, BUFFSIZE);
 	memcpy((void *) addr, (void *) this->addrInfo.ai_addr, this->addrInfo.ai_addrlen);
 	this->addrInfo.ai_addr = (struct sockaddr *) addr;
-//	if (this->addrInfo.ai_socktype == SOCK_STREAM)
-//		throw ErrException("afd");
 	this->sfd = socket(((struct sockaddr_in *) this->addrInfo.ai_addr)->sin_family,
 			this->addrInfo.ai_socktype, this->addrInfo.ai_protocol);
 	if (this->sfd == -1)
@@ -223,7 +223,7 @@ void	ServSocket::ssend(Connection *conn, int i) {
 		conn->setWriteBuff(conn->getWriteBuff().substr(rc));
 	else {
 		conn->setWriteBuff("");
-		this->pollfds[i].events = POLLIN;
+		this->pollfds[i].events = conn->getAlive() ? POLLIN : POLLERR;
 	}
 }
 

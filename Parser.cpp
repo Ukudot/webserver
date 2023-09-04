@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 10:59:46 by gpanico           #+#    #+#             */
-/*   Updated: 2023/08/31 16:55:24 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/04 10:42:12 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,11 +111,9 @@ void	Parser::parserListen(t_node &data) {
 		throw (ErrException("Invalid ip format in listen"));
 	value = this->peek().value.value();
 	if (this->peek().type == int_lit)
-		data.port = std::atoi(value.c_str());
-	else {
-		data.host = value.substr(0, value.find(':'));
-		data.port = std::atoi(value.substr(value.find(':') + 1).c_str());
-	}
+		data.ports[std::atoi(value.c_str())] = "localhost";
+	else
+		data.ports[std::atoi(value.substr(value.find(':') + 1).c_str())] = value.substr(0, value.find(':'));
 	this->consume();
 	if (this->peek().type != semi)
 		throw (ErrException("Missing ';' after listen"));
@@ -308,7 +306,9 @@ void	Parser::parserLocation(t_node &data) {
 	t_node data_location;
 	this->nodes.back()->add(new TreeNode<t_node>(value, data_location));
 	while (this->peek().type != tnull && this->peek().type != close_cbr) {
-		if (this->peek().type != word || this->peek().value.value() == "location")
+		if (this->peek().type != word
+				|| (value = this->peek().value.value()) == "location"
+				|| value == "listen" || value == "server" || value == "server_name")
 			throw (ErrException("Invalid statement in location"));
 		(this->*(this->parsers.at(this->peek().value.value())))(data_location);
 	}
