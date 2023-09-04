@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 10:05:23 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/04 14:42:51 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/04 15:34:25 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,9 +51,20 @@ Server	&Server::operator=(Server const &serv) {
 
 void	Server::interpret(void) {
 	std::vector<ServSocket *>::iterator	ite;
+	std::vector<Connection *>::iterator	iteCon;
+	std::vector<Connection *>			conns;
+	std::string							request;
 
 	for (ite = this->sockets.begin(); ite != this->socket.end(); ite++) {
-
+		if (!(*ite)->spoll())
+			continue ;
+		conns = (*ite)->getConns(true);
+		for (iteCon = conns.begin(); iteCon != conns.end(); iteCon++) {
+			request = this->readConn((*iteCon)); // todo
+			if (request == "")
+				continue;
+			this->writeConn(*iteConn, request); // todo
+		}
 	}
 }
 
