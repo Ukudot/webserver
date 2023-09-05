@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 13:57:03 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/04 11:43:47 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/05 10:47:01 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ class Connection;
 
 class ServSocket {
 	private:
-		struct addrinfo				addrInfo;
 		struct pollfd				pollfds[BACKLOG];
 		int							npoll;
 		int							sfd;
@@ -36,19 +35,19 @@ class ServSocket {
 		std::vector<Connection *>	conns;
 
 		// functions
+		void	createSocket(struct addrinfo *res);
 		void	srecv(Connection *conn, int i);
 		void	ssend(Connection *conn, int i);
 		void	newConn(void);
 		
 	public:
-		ServSocket(std::string ip = "127.0.0.1", int port = 80);
-		ServSocket(struct addrinfo addrInfo);
+		ServSocket(std::string ip = "127.0.0.1", int port = 8000);
+		ServSocket(struct addrinfo *res);
 		~ServSocket(void);
 		ServSocket(ServSocket const &ssock);
 		ServSocket	&operator=(ServSocket const & ssock);
 
 		// getters
-		struct addrinfo				getAddrInfo(void) const;
 		struct pollfd const			*getPollfds(void) const;
 		int							getNpoll(void) const;
 		int							getSfd(void) const;

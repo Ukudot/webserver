@@ -6,49 +6,64 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 13:56:44 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/04 14:17:02 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/05 10:47:31 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ServSocket.hpp"
 
-ServSocket::ServSocket(std::string ip, int port) {
-	struct addrinfo	*addr;
-
-	this->sfd = -1;
-	this->addrInfo.ai_flags = AI_PASSIVE;
-	this->addrInfo.ai_family = AF_UNSPEC;
-	this->addrInfo.ai_socktype = SOCK_STREAM;
-	this->addrInfo.ai_protocol = 0;
-	this->addrInfo.ai_addrlen = sizeof(struct sockaddr);
-	this->addrInfo.ai_canonname = NULL;
-	this->addrInfo.ai_addr = (struct sockaddr *) addr;
-	this->addrInfo.ai_next = NULL;
-	if (getaddrinfo(ip.c_str(), Utils::ft_itoa(port).c_str(), &this->addrInfo, &addr))
-		throw (ErrException("getaddrinfo() failed"));
-	memcpy((void *) &this->addrInfo, (void *) addr, sizeof(struct addrinfo));
-	this->addrInfo.ai_next = NULL;
-	freeaddrinfo(addr);
-	*this = ServSocket(this->addrInfo);
-}
-
-ServSocket::ServSocket(struct addrinfo addrInfo): addrInfo(addrInfo) {
+void	ServSocket::createSocket(struct addrinfo *res) {
 	int	on = 1;
-	struct sockaddr_in	*addr = new struct sockaddr_in;
 
-	memset(this->buff, 0, BUFFSIZE);
-	memcpy((void *) addr, (void *) this->addrInfo.ai_addr, this->addrInfo.ai_addrlen);
-	this->addrInfo.ai_addr = (struct sockaddr *) addr;
-	this->sfd = socket(((struct sockaddr_in *) this->addrInfo.ai_addr)->sin_family,
-			this->addrInfo.ai_socktype, this->addrInfo.ai_protocol);
-	if (this->sfd == -1)
-		throw ErrException("socket() failed");
-	if (setsockopt(this->sfd, SOL_SOCKET, SO_REUSEADDR, (char *) &on, sizeof(on)))
-		throw ErrException("setsockopt() failed");
-	if (bind(this->sfd, (struct sockaddr *) this->addrInfo.ai_addr, this->addrInfo.ai_addrlen))
-		throw ErrException("bind() failed");
+	this->sfd = 0;
+	for (; res; res = res->ai_next) {
+		this->sfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+		if (this->sfd == -1)
+			continue ;
+		if (setsockopt(this->sfd, SOL_SOCKET, SO_REUSEADDR, (char *) &on, sizeof(on)))
+			throw ErrException("setsockopt() failed");
+		if (bind(this->sfd, res->ai_addr, res->ai_addrlen)) {
+			close(this->sfd);
+			continue ;
+		}
+		break ;
+	}
+	if (!res)
+		throw ErrException("Cannot create socket");
 	if (listen(this->sfd, BACKLOG))
 		throw ErrException("listen() failed");
+}
+
+ServSocket::ServSocket(std::string ip, int port) {
+	struct addrinfo	hints, *res;
+
+	memset(this->buff, 0, BUFFSIZE);
+	this->sfd = -1;
+	hints.ai_flags = AI_PASSIVE;
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = 0;
+	if (getaddrinfo(ip.c_str(), Utils::ft_itoa(port).c_str(), &hints, &res))
+		throw (ErrException("getaddrinfo() failed"));
+	try {
+		this->createSocket(res);
+		freeaddrinfo(res);
+	}
+	catch (ErrException &e) {
+		freeaddrinfo(res);
+		throw e;
+	}
+	memset(this->pollfds, 0, sizeof(this->pollfds));
+	this->pollfds[0].fd = this->sfd;
+	this->pollfds[0].events = POLLIN;
+	this->npoll = 1;
+	this->toClean = false;
+	DEBUG("socket created");
+}
+
+ServSocket::ServSocket(struct addrinfo *res) {
+	memset(this->buff, 0, BUFFSIZE);
+	this->createSocket(res);
 	memset(this->pollfds, 0, sizeof(this->pollfds));
 	this->pollfds[0].fd = this->sfd;
 	this->pollfds[0].events = POLLIN;
@@ -62,7 +77,6 @@ ServSocket::~ServSocket(void) {
 	for (ite = this->conns.begin(); ite != this->conns.end(); ite++)
 		delete (*ite);
 	this->conns.clear();
-	delete this->addrInfo.ai_addr;
 }
 
 ServSocket::ServSocket(ServSocket const &ssock) {
@@ -70,30 +84,21 @@ ServSocket::ServSocket(ServSocket const &ssock) {
 }
 
 ServSocket	&ServSocket::operator=(ServSocket const & ssock) {
-	struct sockaddr_in	*tmpAddr;
 	std::vector<Connection *>::iterator	ite;
 
 	if (this == &ssock)
 		return (*this);
-	tmpAddr = (struct sockaddr_in *) this->addrInfo.ai_addr;
 	if (this->sfd != -1)
 		close(this->sfd);
 	this->sfd = ssock.getSfd();
 	memcpy((void *) this->pollfds, (void *) ssock.getPollfds(), sizeof(pollfd) * BACKLOG);
 	this->npoll = ssock.getNpoll();
-	this->addrInfo = ssock.getAddrInfo();
-	this->addrInfo.ai_addr = (struct sockaddr *) tmpAddr;
-	memcpy((void *) this->addrInfo.ai_addr, (void *) ssock.getAddrInfo().ai_addr, this->addrInfo.ai_addrlen);
 	memcpy((void *) this->buff, (void *) ssock.getBuff(), BUFFSIZE);
 	for (ite = this->conns.begin(); ite != this->conns.end(); ite++)
 		delete (*ite);
 	this->conns = ssock.getConns(false);
 	this->toClean = ssock.getToClean();
 	return (*this);
-}
-
-struct addrinfo	ServSocket::getAddrInfo(void) const {
-	return (this->addrInfo);
 }
 
 struct pollfd const	*ServSocket::getPollfds(void) const {
