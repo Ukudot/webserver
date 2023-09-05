@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 13:56:44 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/05 10:47:31 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/05 10:53:17 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ void	ServSocket::createSocket(struct addrinfo *res) {
 ServSocket::ServSocket(std::string ip, int port) {
 	struct addrinfo	hints, *res;
 
-	memset(this->buff, 0, BUFFSIZE);
 	this->sfd = -1;
 	hints.ai_flags = AI_PASSIVE;
 	hints.ai_family = AF_UNSPEC;
@@ -46,19 +45,13 @@ ServSocket::ServSocket(std::string ip, int port) {
 	if (getaddrinfo(ip.c_str(), Utils::ft_itoa(port).c_str(), &hints, &res))
 		throw (ErrException("getaddrinfo() failed"));
 	try {
-		this->createSocket(res);
+		*this  = ServSocket(res);
 		freeaddrinfo(res);
 	}
 	catch (ErrException &e) {
 		freeaddrinfo(res);
 		throw e;
 	}
-	memset(this->pollfds, 0, sizeof(this->pollfds));
-	this->pollfds[0].fd = this->sfd;
-	this->pollfds[0].events = POLLIN;
-	this->npoll = 1;
-	this->toClean = false;
-	DEBUG("socket created");
 }
 
 ServSocket::ServSocket(struct addrinfo *res) {
