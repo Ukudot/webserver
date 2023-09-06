@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 11:12:56 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/05 16:07:31 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/06 11:57:51 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,4 +44,18 @@ void	GetRequest::getInfo(void) {
 		}
 }
 
-void	GetRequest::createRes(void);
+void	GetRequest::createRes(TreeNode<t_node> *config) {
+	std::ifstream		ifs;
+	std::stringstream	html;
+	TreeNode<t_node>	*loc;
+	std::string			tmpPath = this->path;
+
+	if (this->errorCode != 200) {
+		this->response = this->generateError(config->getData().errPages);
+		return ;
+	}
+	loc = this->findLocation(config);
+	if (loc->getName() != "")
+		tmpPath = tmpPath.substr(loc->getName().length());
+
+}

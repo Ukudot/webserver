@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 11:12:56 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/05 12:18:14 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/06 11:25:07 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,5 +20,5 @@ class	GetRequest: public ARequest {
 		GetRequest	&operator=(GetRequest const &req);
 
 		virtual void	getInfo(void);
-		virtual void	createRes(void);
+		virtual void	createRes(TreeMode<t_node> *config);
 };
