@@ -6,11 +6,12 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 10:46:40 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/06 11:49:48 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/06 14:23:55 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Utils.hpp"
+#include "ErrException.hpp"
 
 std::vector<std::string>	Utils::ft_split(std::string str, std::string del)
 {

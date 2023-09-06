@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 11:12:56 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/06 11:59:13 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/06 16:28:21 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ class	ARequest {
 		// vars
 		Connection					*conn;
 		std::string					path;
+		std::string					env;
 		std::string					type;
 		std::string					host;
 		std::string 				response;
@@ -49,7 +50,7 @@ class	ARequest {
 		virtual void		getInfo(void) = 0;
 		virtual void		createRes(TreeNode *config) = 0;
 		void				sendRes(void);
-		std::string			generateError(std::map<int, std::string>);
-		std::stringstream	generateHeader(void) const;
+		std::string			generateError(std::map<int, std::string> errPages = ARequest::errors, std::string red = "");
+		std::stringstream	generateHeader(size_t length, std::string red) const;
 		TreeNode<t_node>	*findLocation(TreeNode<t_node> *config) const;
 };

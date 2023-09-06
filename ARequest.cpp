@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 11:44:53 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/06 12:36:01 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/06 16:15:49 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ void			ARequest::sendRes(void) {
 	this->conn->setAlive(false);
 }
 
-std::string		ARequest::generateError(std::map<int, std::string> errPages) {
+std::string		ARequest::generateError(std::map<int, std::string> errPages, std::string red) {
 	std::string			path;
 	std::stringstream	header;
 	std::stringstream	html;
@@ -90,14 +90,20 @@ std::string		ARequest::generateError(std::map<int, std::string> errPages) {
 		html = Utils::ft_readFile(ERR_500);
 		this->errorCode = 500;
 	}
-	header = this->generateHeader();
-	return (html.str());
+	header = this->generateHeader(html.str().length(), red);
+	return (header.str() + html.str());
 }
 
-std::stringstream	ARequest::generateHeader(void) const {
+std::stringstream	ARequest::generateHeader(size_t length, std::string red) const {
 	std::stringstream	header;
 
-
+	header << "HTTP/1.1 " << this->errorCode << " webserver" << CRLF;
+	if (red == "")
+		header << "Content-Length: " << length << CRLF;
+	else
+		header << "Location: " << red << CRLF;
+	header << CRLF;
+	return (header);
 }
 
 TreeNode<t_node>		*ARequest::findLocation(TreeNode<t_node> *config) const {
