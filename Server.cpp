@@ -17,8 +17,11 @@ std::vector<Server *>	Server::servers;
 Server::Server(TreeNode<t_node>	*config): config(config) {
 	std::map<int, std::string>::iterator	ite;
 
-	for (ite = this->config->getData().ports.begin(); ite != this->config->getData().ports.end(); ite++)
+	for (ite = this->config->getData().ports.begin(); ite != this->config->getData().ports.end(); ite++) {
+		DEBUG("socket started");
 		this->sockets.push_back(new ServSocket(ite->second, ite->first));
+		DEBUG("socket created");
+	}
 	if (!std::distance(this->config->getData().ports.begin(), ite))
 		this->sockets.push_back(new ServSocket());
 	Server::servers.push_back(this);

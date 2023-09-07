@@ -50,7 +50,7 @@ ServSocket::ServSocket(std::string ip, int port) {
 	}
 	catch (ErrException &e) {
 		freeaddrinfo(res);
-		throw e;
+		throw (ErrException(e.what()));
 	}
 }
 

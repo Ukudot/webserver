@@ -126,12 +126,17 @@ int	main(void) {
 
 	try {
 		buffer = Utils::ft_readFile("prova");
+		DEBUG("buffer done");
 		tokenizer = new Tokenizer(buffer);
 		tokens = tokenizer->tokenize();
+		DEBUG("tokenizer done");
 		parser = new Parser(tokens);
 		configs = parser->parse();
-		for (size_t i = 0; i < configs.size(); i++)
+		DEBUG("parser done");
+		for (size_t i = 0; i < configs.size(); i++) {
 			new Server(configs[i]);
+			DEBUG("server done");
+		}
 		while (true)
 			Server::polls();
 	}
@@ -143,4 +148,5 @@ int	main(void) {
 		std::cout << e.what() << std::endl;
 		return (2);
 	}
+	
 }
