@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ARequest.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 11:44:53 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/07 15:20:06 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/07 15:40:19 by adi-stef         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,21 +92,21 @@ std::string		ARequest::generateError(std::map<int, std::string> errPages, std::s
 
 	try {
 		path = errPages.at(this->errorCode);
-		html = Utils::ft_readFile(path);
+		html << Utils::ft_readFile(path);
 	}
 	catch (std::out_of_range &e) {
 		path = ARequest::errors.at(this->errorCode);
-		html = Utils::ft_readFile(path);
+		html << Utils::ft_readFile(path);
 	}
 	catch (ErrException &e) {
-		html = Utils::ft_readFile(ERR_500);
+		html << Utils::ft_readFile(ERR_500);
 		this->errorCode = 500;
 	}
-	header = this->generateHeader(html.str().length(), red);
+	header << this->generateHeader(html.str().length(), red);
 	return (header.str() + html.str());
 }
 
-std::stringstream	ARequest::generateHeader(size_t length, std::string red) const {
+std::string	ARequest::generateHeader(size_t length, std::string red) const {
 	std::stringstream	header;
 
 	header << "HTTP/1.1 " << this->errorCode << " webserver" << CRLF;
@@ -115,7 +115,7 @@ std::stringstream	ARequest::generateHeader(size_t length, std::string red) const
 	else
 		header << "Location: " << red << CRLF;
 	header << CRLF;
-	return (header);
+	return (header.str());
 }
 
 TreeNode<t_node>		*ARequest::findLocation(TreeNode<t_node> *config) const {

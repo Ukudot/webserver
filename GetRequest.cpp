@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   GetRequest.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 11:12:56 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/07 10:59:26 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/07 15:43:25 by adi-stef         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ GetRequest::GetRequest(Connection *conn): ARequest(conn, "GET") {}
 
 GetRequest::~GetRequest(void) {}
 
-GetRequest::GetRequest(GetRequest const &req) {
+GetRequest::GetRequest(GetRequest const &req): ARequest(req) {
 	*this = req;
 }
 
@@ -35,7 +35,7 @@ void	GetRequest::getInfo(void) {
 	std::vector<std::string>			line;
 	std::vector<std::string>::iterator	ite;
 
-	line = ft_split(this->lines[0], " ");
+	line = Utils::ft_split(this->lines[0], " ");
 	this->path = line[1].substr(0, line[1].find("?"));
 	this->env = line[1].substr(this->path.length());
 	this->errorCode = 400;
@@ -77,7 +77,7 @@ void	GetRequest::createRes(TreeNode<t_node> *config) {
 	else
 		tmpPath = loc->getData().root + tmpPath;
 	try {
-		html = Utils::ft_readFile(tmpPath);	
+		html << Utils::ft_readFile(tmpPath);	
 	}
 	catch (ErrException &e) {
 		this->errorCode = 404;

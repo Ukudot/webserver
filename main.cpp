@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 15:51:33 by adi-stef          #+#    #+#             */
-/*   Updated: 2023/09/07 15:21:14 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/07 15:29:24 by adi-stef         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,11 +122,11 @@ int	main(void) {
 	std::vector<token>					tokens;
 	Parser								*parser;
 	Tokenizer							*tokenizer;
-	std::stringstream					buffer;
+	std::string							buffer;
 
 	try {
 		buffer = Utils::ft_readFile("prova");
-		tokenizer = new Tokenizer(buffer.str());
+		tokenizer = new Tokenizer(buffer);
 		tokens = tokenizer->tokenize();
 		parser = new Parser(tokens);
 		configs = parser->parse();

@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/25 12:06:11 by adi-stef          #+#    #+#             */
-/*   Updated: 2023/09/07 10:37:02 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/07 15:42:19 by adi-stef         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,8 +88,8 @@ class TreeNode {
 		void	setData(T data);
 
 		// functions
-		TreeNode const	*search(std::string name) const;
-		void			add(TreeNode *node);
+		TreeNode	*search(std::string name) const;
+		void		add(TreeNode *node);
 };
 
 template <typename T>
@@ -177,7 +177,7 @@ size_t	TreeNode<T>::getIndexByName(std::string name) const {
 }
 
 template <typename T>
-TreeNode<T> const	*TreeNode<T>::search(std::string name) const {
+TreeNode<T>	*TreeNode<T>::search(std::string name) const {
 	int	i;
 
 	i = this->getIndexByName(name);

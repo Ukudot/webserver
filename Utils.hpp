@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 09:37:05 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/07 15:20:50 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/07 15:28:42 by adi-stef         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ class Utils
 		static int						ft_strcmp(const char *s1, const char *s2);
 		template <typename T>
 		static std::string				ft_itoa(T num);
-		static std::stringstream		ft_readFile(std::string file);
+		static std::string				ft_readFile(std::string file);
 		
 };
 
