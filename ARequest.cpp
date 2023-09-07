@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 11:44:53 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/07 12:33:36 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/07 15:20:06 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ ARequest::ARequest(Connection *conn, std::string type): conn(conn), type(type) {
 
 	buffer = this->conn->getReadBuff();
 	buffer = buffer.substr(0, buffer.find(CRLF + CRLF));
-	this->lines = ft_split(buffer, CRLF);
+	this->lines = Utils::ft_split(buffer, CRLF);
 	this->errorCode = 200;
 }
 

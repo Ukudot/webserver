@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 15:51:33 by adi-stef          #+#    #+#             */
-/*   Updated: 2023/09/07 12:32:13 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/07 15:21:14 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,3 +116,31 @@ int main(void) {
 	return (0);
 }
 */
+
+int	main(void) {
+	std::vector<TreeNode<t_node> *>		configs;
+	std::vector<token>					tokens;
+	Parser								*parser;
+	Tokenizer							*tokenizer;
+	std::stringstream					buffer;
+
+	try {
+		buffer = Utils::ft_readFile("prova");
+		tokenizer = new Tokenizer(buffer.str());
+		tokens = tokenizer->tokenize();
+		parser = new Parser(tokens);
+		configs = parser->parse();
+		for (size_t i = 0; i < configs.size(); i++)
+			new Server(configs[i]);
+		while (true)
+			Server::polls();
+	}
+	catch (ErrException &e) {
+		std::cout << e.what() << std::endl;
+		return (1);
+	}
+	catch (std::exception &e) {
+		std::cout << e.what() << std::endl;
+		return (2);
+	}
+}

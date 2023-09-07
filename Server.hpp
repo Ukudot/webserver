@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 10:05:23 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/07 12:26:13 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/07 15:00:00 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,6 @@
 
 class	Server {
 	private:
-		// static vars
-		static std::vector<Server *>	servers;
 
 		// vars
 		std::vector<ServSocket *>	sockets;
@@ -37,6 +35,9 @@ class	Server {
 		Server	&operator=(Server const &serv);
 
 	public:
+
+		// static vars
+		static std::vector<Server *>	servers;
 
 		Server(TreeNode<t_node>	*config);
 		~Server(void);

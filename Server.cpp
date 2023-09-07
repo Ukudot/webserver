@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 10:05:23 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/07 12:44:07 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/07 15:17:38 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,14 @@
 std::vector<Server *>	Server::servers;
 
 Server::Server(TreeNode<t_node>	*config): config(config) {
-	std::map<int, std::string>::const_iterator	ite;
+	std::map<int, std::string>::iterator	ite;
 
 	for (ite = this->config->getData().ports.begin(); ite != this->config->getData().ports.end(); ite++)
 		this->sockets.push_back(new ServSocket(ite->second, ite->first));
 	if (!std::distance(this->config->getData().ports.begin(), ite))
 		this->sockets.push_back(new ServSocket());
 	Server::servers.push_back(this);
+	DEBUG("server created");
 }
 
 Server::~Server(void) {
@@ -56,7 +57,7 @@ void	Server::interpret(void) {
 	std::vector<ARequest *>				reqs;
 	ARequest							*request;
 
-	for (ite = this->sockets.begin(); ite != this->socket.end(); ite++) {
+	for (ite = this->sockets.begin(); ite != this->sockets.end(); ite++) {
 		if (!(*ite)->spoll())
 			continue ;
 		conns = (*ite)->getConns(true);
@@ -68,7 +69,11 @@ void	Server::interpret(void) {
 				continue ;
 			//if (request->getType() == "post")
 			//	this->reqs.push_back();
-			this->writeConn(*iteConn, request); // todo
+			request->getInfo();
+			request->createRes(this->config);
+			request->sendRes();
+			delete request;
+			DEBUG("richiesta evasa");
 		}
 	}
 }
@@ -79,6 +84,7 @@ void	Server::polls(void) {
 	for (ite = Server::servers.begin(); ite != Server::servers.end(); ite++) {
 		try {
 			(*ite)->interpret();
+			DEBUG("...interpreted");
 		}
 		catch (std::exception &e) {
 			std::cout << e.what() << std::endl;
@@ -95,9 +101,9 @@ ARequest	*Server::readConn(Connection *conn) {
 	while (req.find("\r\n") == 0)
 		req = req.substr(2);
 	conn->setReadBuff(req);
-	if (req.find("\r\n\r\n") == NPOS);
+	if (req.find("\r\n\r\n") == NPOS)
 		return (NULL);
-	req = substr(0, req.find("\r\n\r\n"));
+	req = req.substr(0, req.find("\r\n\r\n"));
 	tmp = req.substr(0, req.find("\r\n"));
 	for (int i = 0; i < 2; i++) {
 		if (tmp.find(" ") == NPOS) {

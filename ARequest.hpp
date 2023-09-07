@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 11:12:56 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/07 12:32:59 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/07 15:07:51 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,22 +37,25 @@ class	ARequest {
 		std::vector<std::string>	lines;
 		int							errorCode;
 	
+		// funcs
+		TreeNode<t_node>	*findLocation(TreeNode<t_node> *config) const;
+		std::string			generateError(std::map<int, std::string> errPages = ARequest::errors, std::string red = "");
+		std::stringstream	generateHeader(size_t length, std::string red) const;
+
 	public:
+
 		ARequest(Connection *conn, std::string type);
 		virtual ~ARequest(void);
 		ARequest(ARequest const &req);
 		ARequest	&operator=(ARequest const &req);
 
 		// static funcs
-		static std::map<int, std:::string>	ARequest::initMap(void);
+		static std::map<int, std::string>	initMap(void);
 
 		// funcs
 		std::string const	&getType(void) const;
 		void				setErrorCode(int errorCode);
 		virtual void		getInfo(void) = 0;
-		virtual void		createRes(TreeNode *config) = 0;
+		virtual void		createRes(TreeNode<t_node> *config) = 0;
 		void				sendRes(void);
-		std::string			generateError(std::map<int, std::string> errPages = ARequest::errors, std::string red = "");
-		std::stringstream	generateHeader(size_t length, std::string red) const;
-		TreeNode<t_node>	*findLocation(TreeNode<t_node> *config) const;
 };
