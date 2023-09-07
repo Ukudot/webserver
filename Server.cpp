@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 10:05:23 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/07 15:17:38 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/07 16:41:49 by adi-stef         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,7 @@ void	Server::interpret(void) {
 			delete request;
 			DEBUG("richiesta evasa");
 		}
+		(*ite)->pushBuffers();
 	}
 }
 
@@ -98,28 +99,32 @@ ARequest	*Server::readConn(Connection *conn) {
 	std::string	tmp;
 
 	req = conn->getReadBuff();
-	while (req.find("\r\n") == 0)
+	while (req.find(CRLF) == 0)
 		req = req.substr(2);
 	conn->setReadBuff(req);
-	if (req.find("\r\n\r\n") == NPOS)
+	if (req.find(CRLF + CRLF) == NPOS)
 		return (NULL);
-	req = req.substr(0, req.find("\r\n\r\n"));
-	tmp = req.substr(0, req.find("\r\n"));
+	req = req.substr(0, req.find(CRLF + CRLF));
+	tmp = req.substr(0, req.find(CRLF));
 	for (int i = 0; i < 2; i++) {
 		if (tmp.find(" ") == NPOS) {
 			request = new GetRequest(conn);
 			request->setErrorCode(400);
+			DEBUG(RED + "space missing" + RESET);
 			return (request);
 		}
-		tmp = tmp.substr(tmp.find(" "));
+		tmp = tmp.substr(tmp.find(" ") + 1);
 	}
 	if (tmp.find(" ") != NPOS || tmp.find("HTTP/") == NPOS) {
+		DEBUG(PURPLE + tmp + RESET);
 		request = new GetRequest(conn);
 		request->setErrorCode(400);
+		DEBUG(RED + "too many spaces" + RESET);
 	}
 	else if (tmp.find("HTTP/1.1") == NPOS) {
 		request = new GetRequest(conn);
 		request->setErrorCode(505);
+		DEBUG(RED + "mbad version" + RESET);
 	}
 	else if (req.find("GET") == 0)
 		request = new GetRequest(conn);
@@ -131,5 +136,6 @@ ARequest	*Server::readConn(Connection *conn) {
 		request = new GetRequest(conn);
 		request->setErrorCode(501);
 	}
+	DEBUG(PURPLE + "specific request created" + RESET);
 	return (request);
 }

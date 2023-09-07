@@ -6,12 +6,12 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 11:44:53 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/07 15:40:19 by adi-stef         ###   ########.fr       */
+/*   Updated: 2023/09/07 16:53:25 by adi-stef         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ARequest.hpp"
-#define CRLF std::string("\n\r")
+#define CRLF std::string("\r\n")
 #define NPOS std::string::npos
 #define ERR_200 std::string("errors/error200.html")
 #define ERR_201 std::string("errors/error201.html")
@@ -82,6 +82,7 @@ void			ARequest::setErrorCode(int errorCode) {
 
 void			ARequest::sendRes(void) {
 	this->conn->setWriteBuff(this->response);
+	this->conn->setReadBuff("");
 	this->conn->setAlive(false);
 }
 

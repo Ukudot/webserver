@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 11:12:56 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/07 15:43:25 by adi-stef         ###   ########.fr       */
+/*   Updated: 2023/09/07 16:42:55 by adi-stef         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,11 +39,13 @@ void	GetRequest::getInfo(void) {
 	this->path = line[1].substr(0, line[1].find("?"));
 	this->env = line[1].substr(this->path.length());
 	this->errorCode = 400;
-	for (ite = this->lines.begin(); ite != this->lines.end(); ite++)
+	for (ite = this->lines.begin(); ite != this->lines.end(); ite++) {
 		if ((*ite).substr(0, (*ite).find(":")) == "Host") {
 			this->errorCode = 200;
+			DEBUG(PURPLE + "Host found" + RESET);
 			break ;
 		}
+	}
 }
 
 void	GetRequest::createRes(TreeNode<t_node> *config) {
@@ -85,4 +87,5 @@ void	GetRequest::createRes(TreeNode<t_node> *config) {
 		return ;
 	}
 	this->response = generateHeader(html.str().length(), "") + html.str();
+	DEBUG(CYAN + "response created" + RESET);
 }

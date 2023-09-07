@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServSocket.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 13:56:44 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/05 10:53:17 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/07 16:51:41 by adi-stef         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,7 +221,12 @@ void	ServSocket::ssend(Connection *conn, int i) {
 		conn->setWriteBuff(conn->getWriteBuff().substr(rc));
 	else {
 		conn->setWriteBuff("");
-		this->pollfds[i].events = conn->getAlive() ? POLLIN : POLLERR;
+		if (!conn->getAlive()) {
+			this->pollfds[i].revents = POLLERR;
+			this->toClean = true;
+		}
+		this->pollfds[i].events = POLLIN;
+		DEBUG(RED + "sent all" + RESET);
 	}
 }
 
@@ -243,6 +248,7 @@ void	ServSocket::newConn(void) {
 void	ServSocket::clean(void) {
 	int	pos;
 
+	DEBUG("cleaning");
 	for (int i = 1; i < this->npoll; i++) {
 		if (this->pollfds[i].revents == POLLERR) {
 			pos = this->findConnByFd(this->pollfds[i].fd);

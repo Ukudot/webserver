@@ -3,7 +3,7 @@
 server
 {
     server_name             retourverslefutur.fr;
-    listen                  10.12.3.3:8081;
+    listen                  127.0.0.1:8081;
     root                    /home/user42/Bureau/webserv/www;
     upload                  /home/user42/Bureau/webserv/www/uploads;
     cgi                     php  php-cgi_ubuntu;
@@ -48,8 +48,8 @@ server
     server_name     slowpoke.fr;
     listen          7777; 
     listen          8888;
-    root            /home/user42/Bureau/webserv/slowpoke;
-    upload          /home/user42/Bureau/webserv/slowpoke/uploads;
+    root            /nfs/homes/adi-stef/Documents/Webserver;
+    upload          /nfs/homes/adi-stef/Documents/Webserver/uploads;
     cgi             php  php-cgi_ubuntu;
     cgi-bin         /home/user42/Bureau/webserv/cgi-bin; 
     allow_methods   GET POST;
