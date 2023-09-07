@@ -67,7 +67,6 @@ server
 
     location    /myhome {
         autoindex           on;
-        prohibit_methods    POST;
     }
 
     location /1 {

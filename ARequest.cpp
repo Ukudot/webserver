@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 11:44:53 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/06 16:15:49 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/07 12:33:36 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,23 +32,27 @@ std::map<int, std::string>	ARequest::errors = ARequest::initMap();
 std::map<int, std::string>	ARequest::initMap(void) {
 	std::map<int, std::string>	ret;
 
-	ret[200] = ERR_200;
-	ret[201] = ERR_201;
-	ret[301] = ERR_301;
-	ret[302] = ERR_302;
-	ret[400] = ERR_400;
-	ret[404] = ERR_404;
-	ret[405] = ERR_405;
-	ret[411] = ERR_411;
-	ret[413] = ERR_413;
-	ret[500] = ERR_500;
-	ret[501] = ERR_501;
-	ret[505] = ERR_505;
+	ret[200] = ERR_200; // OK
+	ret[201] = ERR_201; // created
+	ret[301] = ERR_301; // perm redirect
+	ret[302] = ERR_302; // temp redirect
+	ret[400] = ERR_400; // bad request
+	ret[404] = ERR_404; // not found
+	ret[405] = ERR_405; // method not allowed
+	ret[411] = ERR_411; // length required
+	ret[413] = ERR_413; // request too large
+	ret[500] = ERR_500; // server error
+	ret[501] = ERR_501; // not implemented
+	ret[505] = ERR_505; // bad version
 	return (ret);
 }
 
 ARequest::ARequest(Connection *conn, std::string type): conn(conn), type(type) {
-	this->lines = ft_split(this->conn->getReadBuff(), CRLF);
+	std::string	buffer;
+
+	buffer = this->conn->getReadBuff();
+	buffer = buffer.substr(0, buffer.find(CRLF + CRLF));
+	this->lines = ft_split(buffer, CRLF);
 	this->errorCode = 200;
 }
 
@@ -67,6 +71,14 @@ ARequest	&ARequest::operator=(ARequest const &req) {
 	this->host = req.host;
 	return (*this);
 }
+
+std::string const	&ARequest::getType(void) const {
+	return (this->type);
+}
+
+void			ARequest::setErrorCode(int errorCode) {
+	this->errorCode = errorCode;
+}	
 
 void			ARequest::sendRes(void) {
 	this->conn->setWriteBuff(this->response);

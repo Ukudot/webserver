@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/25 12:06:11 by adi-stef          #+#    #+#             */
-/*   Updated: 2023/09/04 10:43:55 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/07 10:37:02 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ class TreeNode {
 		
 		// getters
 		std::string const				&getName(void) const;
-		T const							&getData(void) const;
+		T 								&getData(void);
 		std::vector<TreeNode *> const	&getNext(void) const;
 
 		// setters
@@ -133,7 +133,7 @@ std::string const				&TreeNode<T>::getName(void) const {
 }
 
 template <typename T>
-T const							&TreeNode<T>::getData(void) const {
+T							&TreeNode<T>::getData(void) {
 	return (this->data);
 }
 

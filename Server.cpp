@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 10:05:23 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/04 16:51:41 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/07 12:44:07 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,18 +53,21 @@ void	Server::interpret(void) {
 	std::vector<ServSocket *>::iterator	ite;
 	std::vector<Connection *>::iterator	iteCon;
 	std::vector<Connection *>			conns;
-	std::string							request;
-
+	std::vector<ARequest *>				reqs;
+	ARequest							*request;
 
 	for (ite = this->sockets.begin(); ite != this->socket.end(); ite++) {
 		if (!(*ite)->spoll())
 			continue ;
 		conns = (*ite)->getConns(true);
-		for (iteCon = conns.begin(); iteCon != conns.end(); iteCon++) {
-			request = this->readConn((*iteCon)); // todo
-			if (request == "")
-				continue ;
 
+		for (iteCon = conns.begin(); iteCon != conns.end(); iteCon++) {
+			// gestire richieste post
+			request = this->readConn((*iteCon));
+			if (!request)
+				continue ;
+			//if (request->getType() == "post")
+			//	this->reqs.push_back();
 			this->writeConn(*iteConn, request); // todo
 		}
 	}
@@ -81,4 +84,46 @@ void	Server::polls(void) {
 			std::cout << e.what() << std::endl;
 		}
 	}
+}
+
+ARequest	*Server::readConn(Connection *conn) {
+	ARequest 	*request;
+	std::string	req;
+	std::string	tmp;
+
+	req = conn->getReadBuff();
+	while (req.find("\r\n") == 0)
+		req = req.substr(2);
+	conn->setReadBuff(req);
+	if (req.find("\r\n\r\n") == NPOS);
+		return (NULL);
+	req = substr(0, req.find("\r\n\r\n"));
+	tmp = req.substr(0, req.find("\r\n"));
+	for (int i = 0; i < 2; i++) {
+		if (tmp.find(" ") == NPOS) {
+			request = new GetRequest(conn);
+			request->setErrorCode(400);
+			return (request);
+		}
+		tmp = tmp.substr(tmp.find(" "));
+	}
+	if (tmp.find(" ") != NPOS || tmp.find("HTTP/") == NPOS) {
+		request = new GetRequest(conn);
+		request->setErrorCode(400);
+	}
+	else if (tmp.find("HTTP/1.1") == NPOS) {
+		request = new GetRequest(conn);
+		request->setErrorCode(505);
+	}
+	else if (req.find("GET") == 0)
+		request = new GetRequest(conn);
+	else if (req.find("POST") == 0)
+		; //request = new PostRequest(conn);
+	else if (req.find("DELETE") == 0)
+		; //request = new DeleteRequest(conn);
+	else {
+		request = new GetRequest(conn);
+		request->setErrorCode(501);
+	}
+	return (request);
 }

@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 11:12:56 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/06 16:28:21 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/07 12:32:59 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,8 @@ class	ARequest {
 		static std::map<int, std:::string>	ARequest::initMap(void);
 
 		// funcs
+		std::string const	&getType(void) const;
+		void				setErrorCode(int errorCode);
 		virtual void		getInfo(void) = 0;
 		virtual void		createRes(TreeNode *config) = 0;
 		void				sendRes(void);

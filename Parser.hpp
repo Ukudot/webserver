@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 10:59:46 by gpanico           #+#    #+#             */
-/*   Updated: 2023/08/31 15:03:52 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/07 10:21:41 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ class	Parser {
 		void	parserLocation(t_node &data);
 
 		bool	checkIp(std::string);
+		void	fillFields(void);
 	public:
 		Parser(std::vector<token> &tokens);
 		~Parser(void);

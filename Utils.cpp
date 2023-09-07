@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 10:46:40 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/06 14:23:55 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/07 10:25:44 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,8 +96,8 @@ int	Utils::ft_strcmp(const char *s1, const char *s2)
 	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
 
-std::stringstream		Utils::ft_readFile(std::string file) {
-    std::stringstream   read;
+std::string		Utils::ft_readFile(std::string file) {
+    std::stringstream	read;
     std::ifstream       ifs;
 
     ifs.open(file.c_str(), std::ifstream::in);
@@ -105,5 +105,5 @@ std::stringstream		Utils::ft_readFile(std::string file) {
         throw (ErrException("Error file not found"));
     read << ifs.rdbuf();
     ifs.close();
-	return (read);
+	return (read.str());
 }

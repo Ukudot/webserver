@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 11:12:56 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/06 16:45:44 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/07 10:59:26 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,12 +59,13 @@ void	GetRequest::createRes(TreeNode<t_node> *config) {
 	if (loc->getName() != "")
 		tmpPath = tmpPath.substr(loc->getName().length());
 	if (this->env != "") {;} // todo cgi
-	for (size_t i = 0; i < loc->getData*().redirections.size(); i++)
-		if (tmpPath == loc->getData*().redirections[i].src) {
-			this->errorCode = loc->getData*().redirections[i].type == 'r' ? 302 : 301;
-			this->response = this->generateError(config->getData().errPages, loc->getData*().redirections[i].dst);
+	for (size_t i = 0; i < loc->getData().redirections.size(); i++) {
+		if (tmpPath == loc->getData().redirections[i].src) {
+			this->errorCode = loc->getData().redirections[i].type == 'r' ? 302 : 301;
+			this->response = this->generateError(config->getData().errPages, loc->getData().redirections[i].dst);
 			return ;
 		}
+	}
 	if (loc->getData().root == "") {
 		if (config->getData().root == "") {
 			this->errorCode = 404;

@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 10:59:46 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/04 10:42:12 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/07 10:21:14 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ Parser::Parser(std::vector<token> &tokens): tokens(tokens) {
 	this->parsers["error_page"] = &Parser::parserErrPage;
 	this->parsers["client_max_body_size"] = &Parser::parserMaxBody;
 	this->parsers["allow_methods"] = &Parser::parserMethods;
-	this->parsers["prohibit_methods"] = &Parser::parserPrMethods;
+//	this->parsers["prohibit_methods"] = &Parser::parserPrMethods;
 	this->parsers["rewrite"] = &Parser::parserRewrite;
 	this->parsers["cgi"] = &Parser::parserCgi;
 	this->parsers["cgi-bin"] = &Parser::parserCgiBin;
@@ -87,6 +87,7 @@ std::vector<TreeNode<t_node> *>	Parser::parse(void) {
 		this->nodes.back()->setData(data);
 		this->consume();
 	}
+	this->fillFields();
 	return (this->nodes);
 }
 
@@ -190,27 +191,29 @@ void	Parser::parserMethods(t_node &data) {
 	this->consume();
 }
 
-void	Parser::parserPrMethods(t_node &data) {
-	std::string	value;
-
-	this->consume();
-	if (this->peek().type != word)
-		throw (ErrException("Invalid method in prohibit_methods"));
-	while (this->peek().type == word) {
-		value = this->consume().value.value();
-		if (value == "GET")
-			data.methods &= ~1;
-		else if (value == "POST")
-			data.methods &= ~2;
-		else if (value == "DELETE")
-			data.methods &= ~4;
-		else
-			throw (ErrException("Unknown method in methods"));
-	}
-	if (this->peek().type != semi)
-		throw (ErrException("Missing ';' after prohibit_methods"));
-	this->consume();
-}
+/*
+ * void	Parser::parserPrMethods(t_node &data) {
+ * 	std::string	value;
+ *
+ * 	this->consume();
+ * 	if (this->peek().type != word)
+ * 		throw (ErrException("Invalid method in prohibit_methods"));
+ * 	while (this->peek().type == word) {
+ * 		value = this->consume().value.value();
+ * 		if (value == "GET")
+ * 			data.methods &= ~1;
+ * 		else if (value == "POST")
+ * 			data.methods &= ~2;
+ * 		else if (value == "DELETE")
+ * 			data.methods &= ~4;
+ * 		else
+ * 			throw (ErrException("Unknown method in methods"));
+ * 	}
+ * 	if (this->peek().type != semi)
+ * 		throw (ErrException("Missing ';' after prohibit_methods"));
+ * 	this->consume();
+ * }
+ */
 
 void	Parser::parserRewrite(t_node &data) {
 	t_redirect		red;
@@ -341,4 +344,29 @@ bool	Parser::checkIp(std::string ip) {
 			return (false);
 	}
 	return (true);
+}
+
+void	Parser::fillFields(void) {
+	std::vector<TreeNode<t_node> *>::iterator	ite1;
+	std::vector<TreeNode<t_node> *>::iterator	ite2;
+	std::map<int, std::string>::iterator		ite3;
+	std::map<int, std::string>::iterator		ite4;
+	std::vector<TreeNode<t_node> *>				offspring;
+
+	for (ite1 = this->nodes.begin(); ite1 != this->nodes.end(); ite1++) {
+		offspring = (*ite1)->getNext();
+		for (ite2 = offspring.begin(); ite2 != offspring.end(); ite2++) {
+			if ((*ite2)->getData().root == "")
+				(*ite2)->getData().root = (*ite1)->getData().root;
+			if ((*ite2)->getData().cgiBin == "")
+				(*ite2)->getData().cgiBin = (*ite1)->getData().cgiBin;
+			if ((*ite2)->getData().methods == 0)
+				(*ite2)->getData().methods = (*ite1)->getData().methods;
+			for (ite3 = (*ite1)->getData().errPages.begin(); ite3 != (*ite1)->getData().errPages.end(); ite3++) {
+				ite4 = (*ite2)->getData().errPages.find(ite3->first);
+				if (ite4 == (*ite2)->getData().errPages.end())
+					(*ite2)->getData().errPages[ite3->first] = ite3->second;
+			}
+		}
+	}
 }

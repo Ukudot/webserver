@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 10:05:23 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/04 14:32:49 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/07 12:26:13 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,9 @@
 #include "Tokenizer.hpp"
 #include "Parser.hpp"
 #include "ServSocket.hpp"
+#include "ARequest.hpp"
+#include "GetRequest.hpp"
+#include "Macro.hpp"
 
 class	Server {
 	private:
@@ -39,7 +42,8 @@ class	Server {
 		~Server(void);
 
 		// functions
-		void	interpret(void);
+		void		interpret(void);
+		ARequest	*readConn(Connection *conn);
 
 		// static functions
 		static void	polls(void);
