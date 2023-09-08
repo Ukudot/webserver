@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 10:05:23 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/08 09:39:39 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/08 12:22:53 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,9 @@ void	Server::interpret(void) {
 			//if (request->getType() == "post")
 			//	this->reqs.push_back();
 			request->getInfo();
+			DEBUG(RED + "info completed" + RESET);
 			request->createRes(this->config);
+			DEBUG(RED + "create completed" + RESET);
 			request->sendRes();
 			delete request;
 			DEBUG("richiesta evasa");

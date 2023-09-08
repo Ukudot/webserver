@@ -3,7 +3,7 @@
 server
 {
     server_name             retourverslefutur.fr;
-    listen                  127.0.0.1:8081;
+    listen                  10.11.6.4:8081;
     root                    /nfs/homes/gpanico/Desktop/webserver;
     upload                  /home/user42/Bureau/webserv/www/uploads;
     cgi                     php  php-cgi_ubuntu;
@@ -20,6 +20,7 @@ server
     autoindex               on;
 
     location    /Tester {
+		root					/nfs/homes/gpanico/Downloads;
         autoindex               off;
         client_max_body_size    2000000;
     }

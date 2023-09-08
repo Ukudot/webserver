@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 10:59:46 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/07 10:21:14 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/08 12:36:34 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -296,18 +296,19 @@ void	Parser::parserAutoindex(t_node &data) {
 
 void	Parser::parserLocation(t_node &data) {
 	std::string			value;
+	std::string			name;
 
 	(void) data;
 	this->consume();
 	if (this->peek().type != path
 			|| this->peek(1).type != open_cbr)
 		throw (ErrException("Missing '{' after location"));
-	value = this->consume().value.value();
+	name = this->consume().value.value();
 	this->consume();
 	if (this->peek().type == close_cbr)
 		throw (ErrException("Empty location"));
 	t_node data_location;
-	this->nodes.back()->add(new TreeNode<t_node>(value, data_location));
+	this->nodes.back()->add(new TreeNode<t_node>(name, data_location));
 	while (this->peek().type != tnull && this->peek().type != close_cbr) {
 		if (this->peek().type != word
 				|| (value = this->peek().value.value()) == "location"
@@ -318,7 +319,7 @@ void	Parser::parserLocation(t_node &data) {
 	if (this->peek().type == tnull)
 		throw (ErrException("Unclosed brackets in location"));
 	this->consume();
-	this->nodes.back()->setData(data_location);
+	this->nodes.back()->search(name)->setData(data_location);
 }
 
 bool	Parser::checkIp(std::string ip) {
@@ -357,9 +358,9 @@ void	Parser::fillFields(void) {
 		offspring = (*ite1)->getNext();
 		for (ite2 = offspring.begin(); ite2 != offspring.end(); ite2++) {
 			if ((*ite2)->getData().root == "")
-				(*ite2)->getData().root = (*ite1)->getData().root;
+				(*ite2)->getData().root = (*ite1)->getData().root + (*ite2)->getName();
 			if ((*ite2)->getData().cgiBin == "")
-				(*ite2)->getData().cgiBin = (*ite1)->getData().cgiBin;
+				(*ite2)->getData().cgiBin = (*ite1)->getData().cgiBin + (*ite2)->getName();
 			if ((*ite2)->getData().methods == 0)
 				(*ite2)->getData().methods = (*ite1)->getData().methods;
 			for (ite3 = (*ite1)->getData().errPages.begin(); ite3 != (*ite1)->getData().errPages.end(); ite3++) {
