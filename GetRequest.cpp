@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 11:12:56 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/07 16:42:55 by adi-stef         ###   ########.fr       */
+/*   Updated: 2023/09/08 10:52:51 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	GetRequest::getInfo(void) {
 
 	line = Utils::ft_split(this->lines[0], " ");
 	this->path = line[1].substr(0, line[1].find("?"));
-	this->env = line[1].substr(this->path.length());
+	this->env = line[1].substr(this->path.length() + 1);
 	this->errorCode = 400;
 	for (ite = this->lines.begin(); ite != this->lines.end(); ite++) {
 		if ((*ite).substr(0, (*ite).find(":")) == "Host") {
@@ -60,7 +60,13 @@ void	GetRequest::createRes(TreeNode<t_node> *config) {
 	loc = this->findLocation(config);
 	if (loc->getName() != "")
 		tmpPath = tmpPath.substr(loc->getName().length());
-	if (this->env != "") {;} // todo cgi
+	if (this->env != "") {
+		std::string	newEnv;
+
+		newEnv = Server::env + this->varPars(this->env);
+
+		
+	} // todo cgi
 	for (size_t i = 0; i < loc->getData().redirections.size(); i++) {
 		if (tmpPath == loc->getData().redirections[i].src) {
 			this->errorCode = loc->getData().redirections[i].type == 'r' ? 302 : 301;
@@ -69,17 +75,13 @@ void	GetRequest::createRes(TreeNode<t_node> *config) {
 		}
 	}
 	if (loc->getData().root == "") {
-		if (config->getData().root == "") {
-			this->errorCode = 404;
-			this->response = this->generateError();
-			return ;
-		}
-		tmpPath = config->getData().root + this->path;
+		this->errorCode = 404;
+		this->response = this->generateError();
+		return ;
 	}
-	else
-		tmpPath = loc->getData().root + tmpPath;
+	tmpPath = loc->getData().root + tmpPath;
 	try {
-		html << Utils::ft_readFile(tmpPath);	
+		html << Utils::ft_readFile(tmpPath);
 	}
 	catch (ErrException &e) {
 		this->errorCode = 404;

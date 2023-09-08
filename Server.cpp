@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 10:05:23 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/07 16:41:49 by adi-stef         ###   ########.fr       */
+/*   Updated: 2023/09/08 09:39:39 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,7 @@ ARequest	*Server::readConn(Connection *conn) {
 	if (req.find(CRLF + CRLF) == NPOS)
 		return (NULL);
 	req = req.substr(0, req.find(CRLF + CRLF));
+	DEBUG(GREEN + req + RESET);
 	tmp = req.substr(0, req.find(CRLF));
 	for (int i = 0; i < 2; i++) {
 		if (tmp.find(" ") == NPOS) {
