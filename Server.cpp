@@ -6,13 +6,15 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 10:05:23 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/08 12:22:53 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/08 15:07:20 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
 std::vector<Server *>	Server::servers;
+
+std::vector<char *>	Server::envp;
 
 Server::Server(TreeNode<t_node>	*config): config(config) {
 	std::map<int, std::string>::iterator	ite;

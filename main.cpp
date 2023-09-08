@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 15:51:33 by adi-stef          #+#    #+#             */
-/*   Updated: 2023/09/07 15:29:24 by adi-stef         ###   ########.fr       */
+/*   Updated: 2023/09/08 16:43:57 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,13 +117,18 @@ int main(void) {
 }
 */
 
-int	main(void) {
+int	main(int argc, char *argv[], char *envp[]) {
 	std::vector<TreeNode<t_node> *>		configs;
 	std::vector<token>					tokens;
 	Parser								*parser;
 	Tokenizer							*tokenizer;
 	std::string							buffer;
 
+	(void) argc;
+	(void) argv;
+
+	for (int i = 0; envp[i]; i++)
+		Server::envp.push_back(strdup(envp[i]));
 	try {
 		buffer = Utils::ft_readFile("prova");
 		DEBUG("buffer done");
@@ -142,11 +147,19 @@ int	main(void) {
 	}
 	catch (ErrException &e) {
 		std::cout << e.what() << std::endl;
+		for (size_t i = 0; i < Server::envp.size(); i++)
+			free(Server::envp[i]);
+		Server::envp.clear();
 		return (1);
 	}
 	catch (std::exception &e) {
 		std::cout << e.what() << std::endl;
+		for (size_t i = 0; i < Server::envp.size(); i++)
+			free(Server::envp[i]);
+		Server::envp.clear();
 		return (2);
 	}
-	
+	for (size_t i = 0; i < Server::envp.size(); i++)
+		free(Server::envp[i]);
+	Server::envp.clear();
 }

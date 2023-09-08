@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 10:05:23 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/07 15:00:00 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/08 15:06:53 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ class	Server {
 
 		// static vars
 		static std::vector<Server *>	servers;
+		static std::vector<char *>		envp;
 
 		Server(TreeNode<t_node>	*config);
 		~Server(void);

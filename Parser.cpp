@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 10:59:46 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/08 12:36:34 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/08 15:46:08 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -246,7 +246,7 @@ void	Parser::parserCgi(t_node &data) {
 	if (this->peek().type != word)
 		throw (ErrException("Invalid param in cgi"));
 	value = this->consume().value.value();
-	if (value != "python" && value != "exe" && value != "bash" && value != "php")
+	if (value != "python3" && value != "exe" && value != "bash" && value != "php")
 		throw (ErrException("Unknown type in cgi"));
 	cgi.type = value;
 	if (this->peek().type != word)
