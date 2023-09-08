@@ -15,7 +15,7 @@
 #define	PHP "/usr/bin/php"
 #define	BASH "/bin/bash"
 #define PYTHON "/usr/bin/python3"
-#define CGI_TIMEOUT 10
+#define CGI_TIMEOUT 1
 
 GetRequest::GetRequest(Connection *conn): ARequest(conn, "GET") {}
 
@@ -73,8 +73,12 @@ void	GetRequest::createRes(TreeNode<t_node> *config) {
 		std::string	cgiName;
 
 		cgiName = this->path.substr(this->path.rfind("/"));
+		cgiName = cgiName[0] == '/' ? cgiName.substr(1) : cgiName;
+		DEBUG(PURPLE + "cgi name: " + cgiName + RESET);
 		for (std::vector<t_cgi>::iterator ite = loc->getData().cgis.begin(); ite != loc->getData().cgis.end(); ite++) {
+			DEBUG(RED + "cgi name in loc: " + (*ite).eName + RESET);
 			if ((*ite).eName == cgiName) {
+				DEBUG(RED + "cgi found" + RESET);
 				this->execCgi(loc, (*ite), loc->getData().cgiBin + tmpPath);
 				return ;
 			}
@@ -117,6 +121,7 @@ void	GetRequest::execCgi(TreeNode<t_node> *loc, t_cgi &cgi, std::string path) {
 	int							wstatus;
 
 
+	DEBUG(PURPLE + "executing cgi" + RESET);
 	pipe(fds);
 	pid = fork();
 	if (!pid) {
@@ -162,9 +167,12 @@ void	GetRequest::execCgi(TreeNode<t_node> *loc, t_cgi &cgi, std::string path) {
 			time = -1;
 			break;
 		}
+		std::cout << "time: " << Utils::ft_gettime() - time << std::endl;
 	}
-	if (time != -1)
+	if (time != -1) {
+		DEBUG(RED + "Timeout" + RESET);
 		this->errorCode = 500;
+	}
 	else if (!wstatus) {
 		while (read(fds[0], buff, 1) == 1)
 			output << *buff;
@@ -172,9 +180,13 @@ void	GetRequest::execCgi(TreeNode<t_node> *loc, t_cgi &cgi, std::string path) {
 		this->response = generateHeader(output.str().length(), "") + output.str();
 		return ;
 	}
-	else if (wstatus == 177)
+	else if (wstatus == 177) {
+		DEBUG(RED + "Not Found" + RESET);
 		this->errorCode = 404;
-	else
+	}
+	else {
+		DEBUG(RED + "Error in exec" + RESET);
 		this->errorCode = 500;
+	}
 	this->response = this->generateError(loc->getData().errPages);
 }
