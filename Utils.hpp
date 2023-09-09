@@ -16,7 +16,6 @@
 #include <vector>
 #include <iomanip>
 #include <iostream>
-#include <fstream>
 #include <ctime>
 #include "Macro.hpp"
 
@@ -36,7 +35,6 @@ class Utils
 		static int						ft_strcmp(const char *s1, const char *s2);
 		template <typename T>
 		static std::string				ft_itoa(T num);
-		static std::string				ft_readFile(std::string file);
 		
 };
 
