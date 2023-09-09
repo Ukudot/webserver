@@ -6,11 +6,12 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 15:51:33 by adi-stef          #+#    #+#             */
-/*   Updated: 2023/08/30 15:58:45 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/08 16:43:57 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ServSocket.hpp"
+#include "Server.hpp"
 #include "TreeNode.hpp"
 #include "Tree.hpp"
 
@@ -52,6 +53,7 @@ int	main(void)
 }
 */
 
+/*
 int main(void) {
 	ServSocket					ssock;
 	std::vector<Connection *>	conns;
@@ -112,4 +114,52 @@ int main(void) {
 //	else
 //		std::cout << "non funziona" << std::endl;
 	return (0);
+}
+*/
+
+int	main(int argc, char *argv[], char *envp[]) {
+	std::vector<TreeNode<t_node> *>		configs;
+	std::vector<token>					tokens;
+	Parser								*parser;
+	Tokenizer							*tokenizer;
+	std::string							buffer;
+
+	(void) argc;
+	(void) argv;
+
+	for (int i = 0; envp[i]; i++)
+		Server::envp.push_back(strdup(envp[i]));
+	try {
+		buffer = Utils::ft_readFile("prova");
+		DEBUG("buffer done");
+		tokenizer = new Tokenizer(buffer);
+		tokens = tokenizer->tokenize();
+		DEBUG("tokenizer done");
+		parser = new Parser(tokens);
+		configs = parser->parse();
+		DEBUG("parser done");
+		for (size_t i = 0; i < configs.size(); i++) {
+			new Server(configs[i]);
+			DEBUG("server done");
+		}
+		while (true)
+			Server::polls();
+	}
+	catch (ErrException &e) {
+		std::cout << e.what() << std::endl;
+		for (size_t i = 0; i < Server::envp.size(); i++)
+			free(Server::envp[i]);
+		Server::envp.clear();
+		return (1);
+	}
+	catch (std::exception &e) {
+		std::cout << e.what() << std::endl;
+		for (size_t i = 0; i < Server::envp.size(); i++)
+			free(Server::envp[i]);
+		Server::envp.clear();
+		return (2);
+	}
+	for (size_t i = 0; i < Server::envp.size(); i++)
+		free(Server::envp[i]);
+	Server::envp.clear();
 }

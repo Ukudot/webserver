@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 09:37:05 by gpanico           #+#    #+#             */
-/*   Updated: 2023/08/23 12:18:58 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/08/25 08:35:25 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <vector>
 #include <iomanip>
 #include <iostream>
+#include <fstream>
 #include <ctime>
 #include "Macro.hpp"
 
@@ -35,6 +36,7 @@ class Utils
 		static int						ft_strcmp(const char *s1, const char *s2);
 		template <typename T>
 		static std::string				ft_itoa(T num);
+		static std::string				ft_readFile(std::string file);
 		
 };
 

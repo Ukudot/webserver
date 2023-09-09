@@ -6,13 +6,14 @@
 #    By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/21 11:08:49 by adi-stef          #+#    #+#              #
-#    Updated: 2023/08/30 15:56:11 by gpanico          ###   ########.fr        #
+#    Updated: 2023/09/07 15:02:39 by gpanico          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		= webserv
 # files
-SRC		= main.cpp ServSocket.cpp Utils.cpp Connection.cpp
+SRC		= main.cpp ServSocket.cpp Utils.cpp Connection.cpp Server.cpp Tokenizer.cpp \
+		  Parser.cpp ARequest.cpp GetRequest.cpp
 OBJ		= $(SRC:%.cpp=%.o)
 
 CC		= c++

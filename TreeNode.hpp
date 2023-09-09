@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/25 12:06:11 by adi-stef          #+#    #+#             */
-/*   Updated: 2023/08/31 16:27:15 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/07 15:42:19 by adi-stef         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,7 @@ typedef struct s_redirect {
 
 typedef struct s_node {
 	std::vector<std::string>	servNames;
-	std::string					host;
-	int							port;
+	std::map<int, std::string>	ports;
 	std::string					root;
 	std::map<int, std::string>	errPages;
 	int							maxBodySize;
@@ -52,8 +51,6 @@ typedef struct s_node {
 	std::vector<t_cgi>			cgis;
 	std::string					cgiBin;
 	s_node(void) {
-		host = "127.0.0.1";
-		port = 0;
 		root = "";
 		maxBodySize = 0;
 		methods = 0;
@@ -83,7 +80,7 @@ class TreeNode {
 		
 		// getters
 		std::string const				&getName(void) const;
-		T const							&getData(void) const;
+		T 								&getData(void);
 		std::vector<TreeNode *> const	&getNext(void) const;
 
 		// setters
@@ -91,8 +88,8 @@ class TreeNode {
 		void	setData(T data);
 
 		// functions
-		TreeNode const	*search(std::string name) const;
-		void			add(TreeNode *node);
+		TreeNode	*search(std::string name) const;
+		void		add(TreeNode *node);
 };
 
 template <typename T>
@@ -136,7 +133,7 @@ std::string const				&TreeNode<T>::getName(void) const {
 }
 
 template <typename T>
-T const							&TreeNode<T>::getData(void) const {
+T							&TreeNode<T>::getData(void) {
 	return (this->data);
 }
 
@@ -180,7 +177,7 @@ size_t	TreeNode<T>::getIndexByName(std::string name) const {
 }
 
 template <typename T>
-TreeNode<T> const	*TreeNode<T>::search(std::string name) const {
+TreeNode<T>	*TreeNode<T>::search(std::string name) const {
 	int	i;
 
 	i = this->getIndexByName(name);
