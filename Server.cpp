@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 10:05:23 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/08 15:07:20 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/09 15:24:12 by adi-stef         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,14 +20,12 @@ Server::Server(TreeNode<t_node>	*config): config(config) {
 	std::map<int, std::string>::iterator	ite;
 
 	for (ite = this->config->getData().ports.begin(); ite != this->config->getData().ports.end(); ite++) {
-		DEBUG("socket started");
 		this->sockets.push_back(new ServSocket(ite->second, ite->first));
-		DEBUG("socket created");
 	}
 	if (!std::distance(this->config->getData().ports.begin(), ite))
 		this->sockets.push_back(new ServSocket());
 	Server::servers.push_back(this);
-	DEBUG("server created");
+	DEBUG(GREY + "server created" + RESET);
 }
 
 Server::~Server(void) {
@@ -75,12 +73,12 @@ void	Server::interpret(void) {
 			//if (request->getType() == "post")
 			//	this->reqs.push_back();
 			request->getInfo();
-			DEBUG(RED + "info completed" + RESET);
+			DEBUG(GREY + "info completed" + RESET);
 			request->createRes(this->config);
-			DEBUG(RED + "create completed" + RESET);
+			DEBUG(GREY + "create completed" + RESET);
 			request->sendRes();
 			delete request;
-			DEBUG("richiesta evasa");
+			DEBUG(GREY + "richiesta evasa" + RESET);
 		}
 		(*ite)->pushBuffers();
 	}
@@ -92,7 +90,7 @@ void	Server::polls(void) {
 	for (ite = Server::servers.begin(); ite != Server::servers.end(); ite++) {
 		try {
 			(*ite)->interpret();
-			DEBUG("...interpreted");
+			// DEBUG("...interpreted");
 		}
 		catch (std::exception &e) {
 			std::cout << e.what() << std::endl;
@@ -112,7 +110,7 @@ ARequest	*Server::readConn(Connection *conn) {
 	if (req.find(CRLF + CRLF) == NPOS)
 		return (NULL);
 	req = req.substr(0, req.find(CRLF + CRLF));
-	DEBUG(GREEN + req + RESET);
+	DEBUG(GREEN + "\n" + req + RESET);
 	tmp = req.substr(0, req.find(CRLF));
 	for (int i = 0; i < 2; i++) {
 		if (tmp.find(" ") == NPOS) {
@@ -124,7 +122,6 @@ ARequest	*Server::readConn(Connection *conn) {
 		tmp = tmp.substr(tmp.find(" ") + 1);
 	}
 	if (tmp.find(" ") != NPOS || tmp.find("HTTP/") == NPOS) {
-		DEBUG(PURPLE + tmp + RESET);
 		request = new GetRequest(conn);
 		request->setErrorCode(400);
 		DEBUG(RED + "too many spaces" + RESET);

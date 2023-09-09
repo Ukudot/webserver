@@ -3,12 +3,12 @@
 server
 {
     server_name             retourverslefutur.fr;
-    listen                  10.11.6.4:8081;
-    root                    /nfs/homes/gpanico/Desktop/webserver;
-    upload                  /home/user42/Bureau/webserv/www/uploads;
+    listen                  8000;
+    root                    /home/aldisti/Documents/Webserver/www;
+    upload                  /home/aldisti/Documents/Webserver/uploads;
     cgi                     php  php-cgi_ubuntu;
     cgi                     bash  script;
-    cgi-bin                 /home/user42/Bureau/webserv/cgi-bin;
+    cgi-bin                 /home/aldisti/Documents/Webserver/cgi-bin;
     client_max_body_size    30;
     allow_methods           GET POST;
     index                   index.html;
@@ -21,8 +21,8 @@ server
     autoindex               on;
 
     location    /Tester {
-		root					/nfs/homes/gpanico/Downloads;
-        autoindex               off;
+		root					/home/aldisti/Desktop;
+        autoindex               on;
         client_max_body_size    2000000;
     }
 
@@ -48,16 +48,16 @@ server
 server
 {
     server_name     slowpoke.fr;
-    listen          10.11.6.4:7777; 
-    listen          10.11.6.4:8888;
-    root            /nfs;
-    upload          /nfs;
+    listen          7777; 
+    listen          8888;
+    root            /;
+    upload          /home/aldisti/Documents/Webserver/uploads;
     cgi             php  php-cgi_ubuntu;
-    cgi-bin         /home/user42/Bureau/webserv/cgi-bin; 
+    cgi-bin         /home/aldisti/Documents/Webserver/cgi-bin; 
     allow_methods   GET POST;
     rewrite         /retourverslefutur http://retourverslefutur.fr redirect;
     index           index.html;
-    autoindex       off;
+    autoindex       on;
 
     location    /Tester {
         client_max_body_size    104857;

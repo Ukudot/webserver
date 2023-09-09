@@ -6,16 +6,11 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 11:12:56 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/08 16:51:42 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/09 15:21:51 by adi-stef         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "GetRequest.hpp"
-
-#define	PHP "/usr/bin/php"
-#define	BASH "/bin/bash"
-#define PYTHON "/usr/bin/python3"
-#define CGI_TIMEOUT 1
 
 GetRequest::GetRequest(Connection *conn): ARequest(conn, "GET") {}
 
@@ -42,16 +37,16 @@ void	GetRequest::getInfo(void) {
 
 	line = Utils::ft_split(this->lines[0], " ");
 	this->path = line[1].substr(0, line[1].find("?"));
-	DEBUG(RED + "path created" + RESET);
+	DEBUG(RED + "path: |" + this->path + "|" + RESET);
 	this->env = line[1].substr(this->path.length());
 	if (this->env[0] == '?')
 		this->env = this->env.substr(1);
-	DEBUG(RED + "env created" + RESET);
 	this->errorCode = 400;
 	for (ite = this->lines.begin(); ite != this->lines.end(); ite++) {
 		if ((*ite).substr(0, (*ite).find(":")) == "Host") {
 			this->errorCode = 200;
-			DEBUG(PURPLE + "Host found" + RESET);
+			this->host = (*ite).substr((*ite).find(" ") + 1);
+			DEBUG(PURPLE + "host: |" + this->host + "|" + RESET);
 			break ;
 		}
 	}
@@ -69,31 +64,37 @@ void	GetRequest::createRes(TreeNode<t_node> *config) {
 	loc = this->findLocation(config);
 	if (loc->getName() != "")
 		tmpPath = tmpPath.substr(loc->getName().length());
+
 	{
 		std::string	cgiName;
 
 		cgiName = this->path.substr(this->path.rfind("/"));
 		cgiName = cgiName[0] == '/' ? cgiName.substr(1) : cgiName;
-		DEBUG(PURPLE + "cgi name: " + cgiName + RESET);
 		for (std::vector<t_cgi>::iterator ite = loc->getData().cgis.begin(); ite != loc->getData().cgis.end(); ite++) {
-			DEBUG(RED + "cgi name in loc: " + (*ite).eName + RESET);
 			if ((*ite).eName == cgiName) {
-				DEBUG(RED + "cgi found" + RESET);
+				DEBUG(RED + "cgi name: " + cgiName + RESET);
 				this->execCgi(loc, (*ite), loc->getData().cgiBin + tmpPath);
 				return ;
 			}
 		}
-	} // todo cgi
+	}
+
 	for (size_t i = 0; i < loc->getData().redirections.size(); i++) {
 		if (tmpPath == loc->getData().redirections[i].src) {
 			this->errorCode = loc->getData().redirections[i].type == 'r' ? 302 : 301;
 			this->response = this->generateError(config->getData().errPages, loc->getData().redirections[i].dst);
+			DEBUG(RED + "rewrite done to: " + loc->getData().redirections[i].dst + RESET);
 			return ;
 		}
 	}
 	if (loc->getData().root == "") {
 		this->errorCode = 404;
 		this->response = this->generateError();
+		return ;
+	}
+	if (tmpPath[tmpPath.size() - 1] == '/' && loc->getData().autoindex) { // needs review
+		this->doAutoindex(loc, tmpPath);
+		DEBUG(RED + "autoindex done" + RESET);
 		return ;
 	}
 	tmpPath = loc->getData().root + tmpPath;
@@ -106,7 +107,46 @@ void	GetRequest::createRes(TreeNode<t_node> *config) {
 		return ;
 	}
 	this->response = generateHeader(html.str().length(), "") + html.str();
-	DEBUG(CYAN + "response created" + RESET);
+	DEBUG(CYAN + "GET response created" + RESET);
+}
+
+bool cmp(t_file const &f1, t_file const &f2) {
+   return (f1.name.compare(f2.name) < 0);
+}
+
+void	GetRequest::doAutoindex(TreeNode<t_node> *loc, std::string path) {
+	DIR					*dir;
+	struct dirent       *entry;
+    std::vector<t_file> files;
+	std::stringstream   html;
+	std::string			url;
+
+	if ((dir = opendir((loc->getData().root + path).c_str())) == NULL) { // trys to open the folder
+		this->errorCode = 404;
+		this->response = this->generateError(loc->getData().errPages);
+		return ;
+	}
+
+	while ((entry = readdir(dir)) != NULL)
+		if ((entry->d_type == DT_DIR || entry->d_type == DT_REG) // gets only directories or files
+			&& (entry->d_name[0] != '.' || !entry->d_name[1] // removes all hidden files and folders
+			|| (entry->d_name[1] == '.' && !entry->d_name[2])))
+			files.push_back(t_file(entry->d_name, entry->d_type));
+	closedir(dir);
+
+	std::sort(files.begin(), files.end(), cmp); // sorts the file in ascending order
+
+	html << AUTOIN_HEAD << AUTOIN_BODY;
+	for (std::vector<t_file>::iterator ite = files.begin(); ite != files.end(); ite++) {
+		url = this->host + loc->getName() + path + (*ite).name;
+        if ((*ite).type == DT_DIR)
+            html << AUTOIN_DIR(url, (*ite).name);
+        else
+			html << AUTOIN_FILE(url, (*ite).name);
+	}
+	html << AUTOIN_FOOTER;
+
+	this->response = generateHeader(html.str().length(), "") + html.str();
 }
 
 void	GetRequest::execCgi(TreeNode<t_node> *loc, t_cgi &cgi, std::string path) {
@@ -121,7 +161,7 @@ void	GetRequest::execCgi(TreeNode<t_node> *loc, t_cgi &cgi, std::string path) {
 	int							wstatus;
 
 
-	DEBUG(PURPLE + "executing cgi" + RESET);
+	DEBUG(RED + "executing cgi: " + path + RESET);
 	pipe(fds);
 	pid = fork();
 	if (!pid) {
