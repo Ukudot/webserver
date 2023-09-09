@@ -1,6 +1,0 @@
--> tokenizer per le richieste
--> classe astratta richieste
--> parser per le richieste (nella classe astratta)
--> implementare richieste (GET, POST, DELETE)
--> ogni richiesta puó coservare una connection
--> suddivisione di richieste in corso e nuove richieste nel for del server

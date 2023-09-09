@@ -3,17 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adi-stef <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 15:51:33 by adi-stef          #+#    #+#             */
-/*   Updated: 2023/09/08 16:43:57 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/08/24 13:59:36 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ServSocket.hpp"
-#include "Server.hpp"
-#include "TreeNode.hpp"
-#include "Tree.hpp"
 
 /*
 int	main(void)
@@ -53,7 +50,6 @@ int	main(void)
 }
 */
 
-/*
 int main(void) {
 	ServSocket					ssock;
 	std::vector<Connection *>	conns;
@@ -74,92 +70,5 @@ int main(void) {
 		}
 		ssock.pushBuffers();
 	}
-	ssock.closeSfd();
-//	TreeNode<int>	*node;
-//	TreeNode<int>	*node2;
-//	TreeNode<int>	*node3;
-//	TreeNode<int>	*node4;
-
-//	node = new TreeNode<int>("base", 0);
-//	node2 = new TreeNode<int>("2level", 0);
-//	node3 = new TreeNode<int>("2level-par", 0);
-//	node4 = new TreeNode<int>("3level", 0);
-
-//	node->add(new TreeNode<int>("H", 0));
-//	node->add(new TreeNode<int>("A", 0));
-//	node->add(new TreeNode<int>("E", 0));
-//	node->add(node2);
-//	node->add(node3);
-//	node2->add(new TreeNode<int>("B", 0));
-//	node2->add(new TreeNode<int>("F", 0));
-//	node2->add(new TreeNode<int>("C", 0));
-//	node3->add(new TreeNode<int>("G", 0));
-//	node3->add(new TreeNode<int>("D", 0));
-//	node2->add(node4);
-//	node4->add(new TreeNode<int>("Z", 0));
-//	node4->add(new TreeNode<int>("Y", 0));
-
-//	for (int i = 0; i < 8; i++)
-//		std::cout << node.next[i]->getName() << std::endl;
-	
-//	Tree<int>	tree(node);
-//	tree.print(NULL, "root");
-//	std::vector<std::string>	names = {"2level", "3level", "Z"};
-//	TreeNode<int> const	*search = tree.getNode(names);
-//	std::cout << search->getName() << std::endl;
-//	names.erase(names.begin() + 1);
-//	search = tree.getNode(names);
-//	if (!search)
-//		std::cout << "funziona" << std::endl;
-//	else
-//		std::cout << "non funziona" << std::endl;
 	return (0);
-}
-*/
-
-int	main(int argc, char *argv[], char *envp[]) {
-	std::vector<TreeNode<t_node> *>		configs;
-	std::vector<token>					tokens;
-	Parser								*parser;
-	Tokenizer							*tokenizer;
-	std::string							buffer;
-
-	(void) argc;
-	(void) argv;
-
-	for (int i = 0; envp[i]; i++)
-		Server::envp.push_back(strdup(envp[i]));
-	try {
-		buffer = Utils::ft_readFile("prova");
-		DEBUG("buffer done");
-		tokenizer = new Tokenizer(buffer);
-		tokens = tokenizer->tokenize();
-		DEBUG("tokenizer done");
-		parser = new Parser(tokens);
-		configs = parser->parse();
-		DEBUG("parser done");
-		for (size_t i = 0; i < configs.size(); i++) {
-			new Server(configs[i]);
-			DEBUG("server done");
-		}
-		while (true)
-			Server::polls();
-	}
-	catch (ErrException &e) {
-		std::cout << e.what() << std::endl;
-		for (size_t i = 0; i < Server::envp.size(); i++)
-			free(Server::envp[i]);
-		Server::envp.clear();
-		return (1);
-	}
-	catch (std::exception &e) {
-		std::cout << e.what() << std::endl;
-		for (size_t i = 0; i < Server::envp.size(); i++)
-			free(Server::envp[i]);
-		Server::envp.clear();
-		return (2);
-	}
-	for (size_t i = 0; i < Server::envp.size(); i++)
-		free(Server::envp[i]);
-	Server::envp.clear();
 }
