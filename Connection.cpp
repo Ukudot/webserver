@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 13:54:29 by gpanico           #+#    #+#             */
-/*   Updated: 2023/08/24 11:36:37 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/04 14:16:03 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 Connection::Connection(int fd, struct sockaddr *addr, socklen_t addrlen): fd(fd), addr(addr), addrlen(addrlen) {
 	this->readBuff = "";
 	this->writeBuff = "";
+	this->alive = true;
 }
 
 Connection::~Connection(void) {
@@ -35,6 +36,7 @@ Connection const	&Connection::operator=(Connection const &conn) {
 	this->writeBuff = conn.getWriteBuff();
 	this->addr = conn.getAddr();
 	this->addrlen = conn.getAddrlen();
+	this->alive = conn.alive;
 	return (*this);
 }
 
@@ -58,6 +60,10 @@ socklen_t	Connection::getAddrlen(void) const {
 	return (this->addrlen);
 }
 
+bool	Connection::getAlive(void) const {
+	return (this->alive);
+}
+
 void	Connection::setFd(int const &fd) {
 	this->fd = fd;
 }
@@ -68,4 +74,8 @@ void	Connection::setReadBuff(std::string const &readBuff) {
 
 void	Connection::setWriteBuff(std::string const &writeBuff) {
 	this->writeBuff = writeBuff;
+}
+
+void	Connection::setAlive(bool alive) {
+	this->alive = alive;
 }
