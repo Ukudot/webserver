@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 13:41:43 by gpanico           #+#    #+#             */
-/*   Updated: 2023/08/23 14:55:36 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/04 13:59:49 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ class	Connection {
 		std::string			writeBuff;
 		struct sockaddr		*addr;
 		socklen_t			addrlen;
+		bool				alive;
 
 		// functions 
 		Connection(Connection const &conn);
@@ -37,8 +38,10 @@ class	Connection {
 		std::string		getWriteBuff(void) const;
 		struct sockaddr	*getAddr(void) const;
 		socklen_t		getAddrlen(void) const;
+		bool			getAlive(void) const;
 		// setters
 		void	setFd(int const &fd);
 		void	setReadBuff(std::string const &readBuff);
 		void	setWriteBuff(std::string const &writeBuff);
+		void	setAlive(bool alive);
 };
