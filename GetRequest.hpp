@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 11:12:56 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/09 15:05:57 by adi-stef         ###   ########.fr       */
+/*   Updated: 2023/09/11 15:08:17 by adi-stef         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,12 @@
 
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
 #include <dirent.h>
 #include <vector>
 #include <algorithm>
+#include <ctime>
 #include "ARequest.hpp"
 #include "Server.hpp"
 
@@ -26,17 +28,20 @@
 #define	BASH "/bin/bash"
 #define PYTHON "/usr/bin/python3"
 // autoindex
-#define AUTOIN_FONT "h3"
-#define AUTOIN_HEAD "<!DOCTYPE html>\n<html>\n<head>\n</head>\n"
-#define AUTOIN_BODY "<body>\n<h1>Autoindex</h1>\n<" << AUTOIN_FONT << ">\n"
-#define AUTOIN_LINK(url, name, css) "<a href=\"http://" << url << "\" style=\"" << css << "\">" << name << "</a><br>\n"
-#define AUTOIN_DIR(url, name) AUTOIN_LINK(url + "/", name, "color:blue; text-decoration:none;")
+#define AUTOIN_HEAD "<!DOCTYPE html>\n<html>\n\t<head>\n\t</head>\n"
+#define AUTOIN_BODY(path) "\t<body>\n\t\t<h1 style=\"font-family:arial;\"> Index of " << path << "</h1>\n\t\t<hr>\n\t\t<div style=\"display:flex; flex-direction:column; font-family:arial;\">\n"
+#define AUTOIN_CAT "\t\t\t<div style=\"display:flex; font-weight:900; color:black; justify-content:start\">\n\t\t\t\t<span style=\"width:15vw;\">" << "FILE NAME" << "</span>\n\t\t\t\t<span style=\"width: 15vw;\">"<< "FILE SIZE" <<"</span>\n\t\t\t\t<span style=\"width: 15vw;\">"<< "LAST MODIFICATION" <<"</span>\n\t\t\t</div>\n"
+#define AUTOIN_LINK(url, name, css) std::string("<a href=\"http://") + url + "\" style=\"width:15vw; " + css + "\">" + name + "</a>"
+#define AUTOIN_LINE(link, dim, date) "\t\t\t<div style=\"display:flex; justify-content:start\">\n\t\t\t\t" << link << "\n\t\t\t\t<span style=\"width: 15vw;\">" << dim << "</span>\n\t\t\t\t<span style=\"width: 15vw;\">" << date << "</span>\n\t\t\t</div>\n"
+#define AUTOIN_DIR(url, name) AUTOIN_LINK(url + "/", name, "color:blue;")
 #define AUTOIN_FILE(url, name) AUTOIN_LINK(url, name, "color:black; text-decoration:none;")
-#define AUTOIN_FOOTER "</" << AUTOIN_FONT << ">\n</body>\n</html>"
+#define AUTOIN_FOOTER "\t\t</div>\n\t\t<hr>\n\t</body>\n</html>"
 
 typedef struct s_file {
     std::string     name;
     unsigned char   type;
+	std::string		date;
+	size_t			dim;
     s_file() {
         this->name = "";
         this->type = 0;
@@ -49,6 +54,9 @@ class	GetRequest: public ARequest {
 
 		void	execCgi(TreeNode<t_node> *loc, t_cgi &cgi, std::string path);
 		void	doAutoindex(TreeNode<t_node> *loc, std::string path);
+
+		static bool	cmp(t_file const &f1, t_file const &f2);
+		static bool	getFileInfo(std::string path, t_file &file);
 
 	public:
 

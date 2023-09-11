@@ -4,11 +4,11 @@ server
 {
     server_name             retourverslefutur.fr;
     listen                  8000;
-    root                    /home/aldisti/Documents/Webserver/www;
-    upload                  /home/aldisti/Documents/Webserver/uploads;
+    root                    /nfs/homes/adi-stef/Documents/Webserver;
+    upload                  /nfs/homes/adi-stef/Documents/Webserver/uploads;
     cgi                     php  php-cgi_ubuntu;
     cgi                     bash  script;
-    cgi-bin                 /home/aldisti/Documents/Webserver/cgi-bin;
+    cgi-bin                 /nfs/homes/adi-stef/Documents/Webserver/cgi-bin;
     client_max_body_size    30;
     allow_methods           GET POST;
     index                   index.html;
@@ -51,9 +51,9 @@ server
     listen          7777; 
     listen          8888;
     root            /;
-    upload          /home/aldisti/Documents/Webserver/uploads;
+    upload          /nfs/homes/adi-stef/Documents/Webserver/uploads;
     cgi             php  php-cgi_ubuntu;
-    cgi-bin         /home/aldisti/Documents/Webserver/cgi-bin; 
+    cgi-bin         /nfs/homes/adi-stef/Documents/Webserver/cgi-bin; 
     allow_methods   GET POST;
     rewrite         /retourverslefutur http://retourverslefutur.fr redirect;
     index           index.html;

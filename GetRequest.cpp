@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 11:12:56 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/09 15:21:51 by adi-stef         ###   ########.fr       */
+/*   Updated: 2023/09/11 14:54:01 by adi-stef         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,9 @@ void	GetRequest::createRes(TreeNode<t_node> *config) {
 		this->response = this->generateError();
 		return ;
 	}
-	if (tmpPath[tmpPath.size() - 1] == '/' && loc->getData().autoindex) { // needs review
+	if (opendir((loc->getData().root + tmpPath).c_str()) && loc->getData().autoindex) { // needs review
+		if (tmpPath[tmpPath.size() - 1] != '/')
+			tmpPath += "/";
 		this->doAutoindex(loc, tmpPath);
 		DEBUG(RED + "autoindex done" + RESET);
 		return ;
@@ -110,8 +112,23 @@ void	GetRequest::createRes(TreeNode<t_node> *config) {
 	DEBUG(CYAN + "GET response created" + RESET);
 }
 
-bool cmp(t_file const &f1, t_file const &f2) {
+bool	GetRequest::cmp(t_file const &f1, t_file const &f2) {
    return (f1.name.compare(f2.name) < 0);
+}
+
+bool	GetRequest::getFileInfo(std::string path, t_file &file) {
+	struct stat			data;
+	struct tm			*lt = NULL;
+	std::stringstream	date;
+
+	if (stat(path.c_str(), &data))
+		return (false);
+	file.dim = (size_t) data.st_size;
+	lt = localtime(&(data.st_mtim.tv_sec));
+	date << lt->tm_mday << " " << lt->tm_mon << " " << (lt->tm_year + 1900);
+	date << " " << lt->tm_hour << ":" << lt->tm_min << ":" << lt->tm_sec;
+	file.date = date.str();
+	return (true);
 }
 
 void	GetRequest::doAutoindex(TreeNode<t_node> *loc, std::string path) {
@@ -126,7 +143,7 @@ void	GetRequest::doAutoindex(TreeNode<t_node> *loc, std::string path) {
 		this->response = this->generateError(loc->getData().errPages);
 		return ;
 	}
-
+	DEBUG(BLUE + path + RESET);
 	while ((entry = readdir(dir)) != NULL)
 		if ((entry->d_type == DT_DIR || entry->d_type == DT_REG) // gets only directories or files
 			&& (entry->d_name[0] != '.' || !entry->d_name[1] // removes all hidden files and folders
@@ -136,13 +153,18 @@ void	GetRequest::doAutoindex(TreeNode<t_node> *loc, std::string path) {
 
 	std::sort(files.begin(), files.end(), cmp); // sorts the file in ascending order
 
-	html << AUTOIN_HEAD << AUTOIN_BODY;
+	html << AUTOIN_HEAD << AUTOIN_BODY (path) << AUTOIN_CAT;
 	for (std::vector<t_file>::iterator ite = files.begin(); ite != files.end(); ite++) {
 		url = this->host + loc->getName() + path + (*ite).name;
+		if (!GetRequest::getFileInfo(loc->getData().root + path + (*ite).name, *ite)) {
+			this->errorCode = 500;
+			this->response = this->generateError(loc->getData().errPages);
+			return ;
+		}
         if ((*ite).type == DT_DIR)
-            html << AUTOIN_DIR(url, (*ite).name);
+            html << AUTOIN_LINE(AUTOIN_DIR(url, (*ite).name), (*ite).dim, (*ite).date);
         else
-			html << AUTOIN_FILE(url, (*ite).name);
+			html << AUTOIN_LINE(AUTOIN_FILE(url, (*ite).name), (*ite).dim, (*ite).date);
 	}
 	html << AUTOIN_FOOTER;
 
