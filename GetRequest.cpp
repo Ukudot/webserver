@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 11:12:56 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/11 14:13:30 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/11 14:26:13 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #define	PHP "/usr/bin/php"
 #define	BASH "/bin/bash"
 #define PYTHON "/usr/bin/python3"
-#define CGI_TIMEOUT 10
+#define CGI_TIMEOUT 1
 
 GetRequest::GetRequest(Connection *conn): ARequest(conn, "GET") {}
 
@@ -125,6 +125,7 @@ void	GetRequest::execCgi(TreeNode<t_node> *loc, t_cgi &cgi, std::string path) {
 	int							wstatus;
 	long						time;
 
+	DEBUG(PURPLE + "executing cgi" + RESET);
 	pipe(fds);
 	pid = this->launchCgi(fds, cgi, path);
 	time = Utils::ft_gettime();

@@ -100,8 +100,13 @@ std::string		ARequest::generateError(std::map<int, std::string> errPages, std::s
 		html << Utils::ft_readFile(path);
 	}
 	catch (ErrException &e) {
+		/*
+		std::cout << e.what() << std::endl;
 		html << Utils::ft_readFile(ERR_500);
 		this->errorCode = 500;
+		*/
+		path = ARequest::errors.at(this->errorCode);
+		html << Utils::ft_readFile(path);
 	}
 	header << this->generateHeader(html.str().length(), red);
 	return (header.str() + html.str());
