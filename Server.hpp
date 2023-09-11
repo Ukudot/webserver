@@ -6,7 +6,7 @@
 /*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 10:05:23 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/08 15:06:53 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/11 15:45:18 by adi-stef         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@
 
 class	Server {
 	private:
-
 		// vars
 		std::vector<ServSocket *>	sockets;
 		TreeNode<t_node>			*config;
