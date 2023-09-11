@@ -8,11 +8,11 @@ server
     upload                  /home/user42/Bureau/webserv/www/uploads;
     cgi                     php  php-cgi_ubuntu;
     cgi                     bash  script;
-    cgi-bin                 /home/user42/Bureau/webserv/cgi-bin;
+    cgi-bin                 /nfs/homes/gpanico/Desktop/webserver;
     client_max_body_size    30;
     allow_methods           GET POST;
     index                   index.html;
-    rewrite                 /recherche  http://www.google.fr  permanent;
+    rewrite                 /google  http://www.google.fr  permanent;
     rewrite                 /slowpock  http://slowpock.fr:8888  redirect;
     rewrite                 /test   /Tester redirect;
     error_page              404  /errors/404.html;
