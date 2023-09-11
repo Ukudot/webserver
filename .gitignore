@@ -17,6 +17,7 @@ mlx
 mlx/*
 *tester*
 *.un~
+webserv
 
 # Executables
 ircserv
