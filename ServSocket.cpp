@@ -224,6 +224,7 @@ void	ServSocket::ssend(Connection *conn, int i) {
 			this->toClean = true;
 		}
 		this->pollfds[i].events = POLLIN;
+		DEBUG(RED + "sent all" + RESET);
 	}
 }
 

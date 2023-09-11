@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   GetRequest.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 11:12:56 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/11 15:08:17 by adi-stef         ###   ########.fr       */
+/*   Updated: 2023/09/11 14:06:20 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,13 @@ typedef struct s_file {
 class	GetRequest: public ARequest {
 	private:
 
-		void	execCgi(TreeNode<t_node> *loc, t_cgi &cgi, std::string path);
 		void	doAutoindex(TreeNode<t_node> *loc, std::string path);
+		char	**updateEnvp(void);
+		bool	reds(TreeNode<t_node> *config, TreeNode<t_node> *loc, std::string tmpPath);
+		bool	cgi(TreeNode<t_node> *loc, std::string tmpPath);
+		void	execCgi(TreeNode<t_node> *loc, t_cgi &cgi, std::string path);
+		pid_t	launchCgi(int *fds, t_cgi &cgi, std::string path);
+		void	deleteMat(void **mat);
 
 		static bool	cmp(t_file const &f1, t_file const &f2);
 		static bool	getFileInfo(std::string path, t_file &file);

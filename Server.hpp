@@ -25,6 +25,7 @@
 
 class	Server {
 	private:
+
 		// vars
 		std::vector<ServSocket *>	sockets;
 		TreeNode<t_node>			*config;

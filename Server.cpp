@@ -144,4 +144,3 @@ ARequest	*Server::readConn(Connection *conn) {
 	DEBUG(PURPLE + "specific request created" + RESET);
 	return (request);
 }
-
