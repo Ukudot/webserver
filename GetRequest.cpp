@@ -31,6 +31,7 @@ GetRequest	&GetRequest::operator=(GetRequest const &req) {
 	this->conn = req.conn;
 	this->type = req.type;
 	this->path = req.path;
+	this->pathInfo = req.pathInfo;
 	this->env = req.env;
 	this->host = req.host;
 	return (*this);
@@ -69,6 +70,7 @@ void	GetRequest::createRes(TreeNode<t_node> *config) {
 	loc = this->findLocation(config);
 	if (loc->getName() != "")
 		tmpPath = tmpPath.substr(loc->getName().length());
+	DEBUG(GREEN + "tmpPath: " + tmpPath + RESET);
 	// cgis && reds
 	if (this->cgi(loc, tmpPath) || this->reds(config, loc, tmpPath))
 		return ;
@@ -103,13 +105,24 @@ bool	GetRequest::reds(TreeNode<t_node> *config, TreeNode<t_node> *loc, std::stri
 
 bool	GetRequest::cgi(TreeNode<t_node> *loc, std::string tmpPath) {
 	std::string	cgiName;
+	size_t		cgiPos;
 
-	cgiName = this->path.substr(this->path.rfind("/") + 1);
+	//cgiName = this->path.substr(this->path.rfind("/") + 1);
+	
 	for (std::vector<t_cgi>::iterator ite = loc->getData().cgis.begin(); ite != loc->getData().cgis.end(); ite++) {
 		DEBUG(PURPLE + "cgiName: " + cgiName + RESET);
-		if ((*ite).eName == cgiName) {
+		DEBUG(PURPLE + "tmpPath: " + tmpPath + RESET);
+		DEBUG(PURPLE + "eName: " + (*ite).eName + RESET);
+		//if ((*ite).eName == cgiName) {
+		cgiPos = this->path.find((*ite).eName);
+		std::cout << ">> cgiPos: " << cgiPos << std::endl;
+		if (cgiPos == 1) {
 			DEBUG(RED + "cgi found" + RESET);
-			this->execCgi(loc, (*ite), loc->getData().cgiBin + tmpPath);
+			this->pathInfo = this->path.substr((*ite).eName.length() + 1, this->path.find("?") - (*ite).eName.length());
+			DEBUG(RED + "cgi path: " + this->path + RESET);
+			DEBUG(RED + "cgi path info: " + this->pathInfo + RESET);
+			DEBUG(RED + "cgi string query: " + this->env + RESET);
+			this->execCgi(loc, (*ite), loc->getData().cgiBin + "/" + (*ite).eName);
 			return (true);
 		}
 	}
@@ -137,8 +150,10 @@ void	GetRequest::execCgi(TreeNode<t_node> *loc, t_cgi &cgi, std::string path) {
 			break;
 		}
 	}
-	if (time != -1)
+	if (time != -1) {
+		DEBUG(RED + "Server error" + RESET);
 		this->errorCode = 500;
+	}
 	else if (!wstatus) {
 		while (read(fds[0], buff, 1) == 1)
 			output << *buff;
@@ -159,12 +174,16 @@ char	**GetRequest::updateEnvp(void) {
 	size_t						i = 0;
 
 	splittedEnv = Utils::ft_split(this->env, "&");
-	envp = new char*[splittedEnv.size() + Server::envp.size() + 1];
+//	envp = new char*[splittedEnv.size() + Server::envp.size() + 1];
+	envp = new char*[Server::envp.size() + 3];
 	for (; i < Server::envp.size(); i++)
 		envp[i] = Server::envp[i];
-	for (size_t j = 0; j < splittedEnv.size(); j++, i++)
-		envp[i] = strdup(splittedEnv[j].c_str());
-	envp[i] = NULL;
+//	for (size_t j = 0; j < splittedEnv.size(); j++, i++)
+//		envp[i] = strdup(splittedEnv[j].c_str());
+//	envp[i] = strdup(splittedEnv[j].c_str());
+	envp[i] = strdup(std::string(std::string("QUERY_STRING=") + this->env).c_str()); // implement MACRO
+	envp[i + 1] = strdup(std::string(std::string("PATH_INFO=") + this->pathInfo).c_str()); // implement MACRO
+	envp[i + 2] = NULL;
 	return (envp);
 }
 

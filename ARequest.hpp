@@ -30,6 +30,7 @@ class	ARequest {
 		// vars
 		Connection					*conn;
 		std::string					path;
+		std::string					pathInfo;
 		std::string					env;
 		std::string					type;
 		std::string					host;
