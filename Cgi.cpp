@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Cgi.cpp                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/09/13 14:12:18 by gpanico           #+#    #+#             */
+/*   Updated: 2023/09/13 14:12:21 by gpanico          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Cgi.hpp"
 #define QUERY_STRING(env) std::string(std::string("QUERY_STRING=") + env).c_str()
 #define PATH_INFO(path) std::string(std::string("PATH_INFO=") + path).c_str()
@@ -63,16 +75,19 @@ void	Cgi::setPathInfo(std::string pathInfo) {
 
 long	Cgi::timeout(int &wstatus) {
 	long	time;
+	int		ret;
 
 	time = Utils::ft_gettime();
 	while (Utils::ft_gettime() - time < CGI_TIMEOUT) {
-		waitpid(this->pid, &wstatus, WNOHANG);
-		std::cout << RED << "pid_t: " << this->pid << RESET << std::endl;
-		if (WIFEXITED(wstatus)) {
+		ret = waitpid(this->pid, &wstatus, WNOHANG);
+		if (ret == -1) {
+			this->errorCode = 177;
+			break ;
+		}
+		else if (ret && WIFEXITED(wstatus)) {
 			wstatus = WEXITSTATUS(wstatus);
-			std::cout << GREEN << "wstatus: " << wstatus << RESET << std::endl;
 			time = -1;
-			break;
+			break ;
 		}
 	}
 	return (time);
@@ -87,24 +102,7 @@ std::string	Cgi::execCgi(void) {
 	DEBUG(PURPLE + "executing cgi" + RESET);
 	pipe(fds);
 	this->launchCgi(fds);
-	long	time;
-
-	time = Utils::ft_gettime();
-	while (Utils::ft_gettime() - time < CGI_TIMEOUT) {
-		int wt = waitpid(this->pid, &wstatus, WNOHANG);
-		if (wt == -1) {
-			wstatus = 177;
-			break;
-		}
-		std::cout << RED << "waitpid(): " << wt << RESET << std::endl;
-		if (wt && WIFEXITED(wstatus)) {
-			wstatus = WEXITSTATUS(wstatus);
-			std::cout << GREEN << "wstatus: " << wstatus << RESET << std::endl;
-			time = -1;
-			break;
-		}
-	}
-	if (time != -1) {
+	if (this->timeout(wstatus) != -1) {
 		DEBUG(RED + "Server error" + RESET);
 		this->errorCode = 500;
 	}
