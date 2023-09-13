@@ -3,7 +3,7 @@
 server
 {
     server_name             retourverslefutur.fr;
-    listen                  8081;
+    listen                  8000;
     root                    /nfs/homes/Desktop/gpanico/webserver;
     upload                  /nfs/homes/user42/Bureau/webserv/www/uploads;
     cgi                     php  php-cgi_ubuntu;
@@ -23,8 +23,8 @@ server
     autoindex               on;
 
     location    /Tester {
-		root					/nfs/homes/gpanico/Downloads;
-        autoindex               off;
+		root					/home/aldisti/Desktop;
+        autoindex               on;
         client_max_body_size    2000000;
     }
 
@@ -55,11 +55,11 @@ server
     root            /nfs;
     upload          /nfs;
     cgi             php  php-cgi_ubuntu;
-    cgi-bin         /home/user42/Bureau/webserv/cgi-bin; 
+    cgi-bin         /nfs/homes/adi-stef/Documents/Webserver/cgi-bin; 
     allow_methods   GET POST;
     rewrite         /retourverslefutur http://retourverslefutur.fr redirect;
     index           index.html;
-    autoindex       off;
+    autoindex       on;
 
     location    /Tester {
         client_max_body_size    104857;

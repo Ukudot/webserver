@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 11:12:56 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/07 15:40:54 by adi-stef         ###   ########.fr       */
+/*   Updated: 2023/09/09 10:29:04 by adi-stef         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,21 @@
 #include "TreeNode.hpp"
 #include "Utils.hpp"
 #include "ErrException.hpp"
+
+#define CRLF std::string("\r\n")
+#define NPOS std::string::npos
+#define ERR_200 std::string("www/errors/error200.html")
+#define ERR_201 std::string("www/errors/error201.html")
+#define ERR_301 std::string("www/errors/error301.html")
+#define ERR_302 std::string("www/errors/error302.html")
+#define ERR_400 std::string("www/errors/error400.html")
+#define ERR_404 std::string("www/errors/error404.html")
+#define ERR_405 std::string("www/errors/error405.html")
+#define ERR_411 std::string("www/errors/error411.html")
+#define ERR_413 std::string("www/errors/error413.html")
+#define ERR_500 std::string("www/errors/error500.html")
+#define ERR_501 std::string("www/errors/error501.html")
+#define ERR_505 std::string("www/errors/error505.html")
 
 class	ARequest {
 	protected:

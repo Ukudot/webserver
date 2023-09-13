@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 13:56:44 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/07 16:51:41 by adi-stef         ###   ########.fr       */
+/*   Updated: 2023/09/11 15:40:05 by adi-stef         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ ServSocket::ServSocket(struct addrinfo *res) {
 	this->pollfds[0].events = POLLIN;
 	this->npoll = 1;
 	this->toClean = false;
-	DEBUG("socket created");
+	DEBUG(GREY + "socket created" + RESET);
 }
 
 ServSocket::~ServSocket(void) {
@@ -149,9 +149,8 @@ bool	ServSocket::spoll(void) {
 	Connection	*conn;
 	int			rc;
 
-	DEBUG("Polling...");
+	// DEBUG("Polling...");
 	rc = poll(this->pollfds, this->npoll, TIMEOUT);
-//	std::cout << this->pollfds[0].revents <<std::endl;
 	if (rc == -1)
 		throw ErrException("poll() failed");
 	else if (rc == 0)
@@ -159,7 +158,6 @@ bool	ServSocket::spoll(void) {
 	if (this->pollfds[0].revents == POLLIN && this->npoll < BACKLOG)
 		this->newConn();
 	for (int i = 1; i < this->npoll; i++) {
-//		std::cout << this->pollfds[1].revents <<std::endl;
 		if (this->pollfds[i].fd == -1) {
 			this->toClean = true;
 			ERROR("fd set to -1");
@@ -177,7 +175,6 @@ bool	ServSocket::spoll(void) {
 		else if (this->pollfds[i].revents == POLLOUT && conn->getWriteBuff() != "")
 			this->ssend(conn, i);
 		else if (this->pollfds[i].revents & !POLLOUT & !POLLIN) {
-//			std::cout << this->pollfds[i].revents <<std::endl;
 			this->toClean = true;
 			this->pollfds[i].revents = POLLERR;
 		}
@@ -193,7 +190,7 @@ bool	ServSocket::spoll(void) {
 void	ServSocket::srecv(Connection *conn, int i) {
 	int	rc;
 
-	DEBUG("Connection receiving data");
+	DEBUG(CYAN + "connection receiving data" + RESET);
 	memset(this->buff, 0, BUFFSIZE);
 	rc = recv(conn->getFd(), this->buff, BUFFSIZE, MSG_DONTWAIT);
 	if (rc == -1)
@@ -209,7 +206,7 @@ void	ServSocket::srecv(Connection *conn, int i) {
 void	ServSocket::ssend(Connection *conn, int i) {
 	int	rc;
 
-	DEBUG("Connection sending data");
+	DEBUG(CYAN + "Connection sending data" + RESET);
 	rc = send(conn->getFd(), conn->getWriteBuff().c_str(), conn->getWriteBuff().size(), MSG_DONTWAIT);
 	if (rc == -1)
 		throw ErrException("send() failed");
@@ -220,6 +217,7 @@ void	ServSocket::ssend(Connection *conn, int i) {
 	else if (rc < (int) conn->getWriteBuff().size())
 		conn->setWriteBuff(conn->getWriteBuff().substr(rc));
 	else {
+		DEBUG(GREEN + "sent :\n" + conn->getWriteBuff() + RESET);
 		conn->setWriteBuff("");
 		if (!conn->getAlive()) {
 			this->pollfds[i].revents = POLLERR;
@@ -248,7 +246,7 @@ void	ServSocket::newConn(void) {
 void	ServSocket::clean(void) {
 	int	pos;
 
-	DEBUG("cleaning");
+	DEBUG(YELLOW + "cleaning" + RESET);
 	for (int i = 1; i < this->npoll; i++) {
 		if (this->pollfds[i].revents == POLLERR) {
 			pos = this->findConnByFd(this->pollfds[i].fd);

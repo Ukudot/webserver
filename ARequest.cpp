@@ -11,21 +11,6 @@
 /* ************************************************************************** */
 
 #include "ARequest.hpp"
-#define CRLF std::string("\r\n")
-#define NPOS std::string::npos
-#define ERR_200 std::string("errors/error200.html")
-#define ERR_201 std::string("errors/error201.html")
-#define ERR_301 std::string("errors/error301.html")
-#define ERR_302 std::string("errors/error302.html")
-#define ERR_400 std::string("errors/error400.html")
-#define ERR_404 std::string("errors/error404.html")
-#define ERR_405 std::string("errors/error405.html")
-#define ERR_411 std::string("errors/error411.html")
-#define ERR_413 std::string("errors/error413.html")
-#define ERR_500 std::string("errors/error500.html")
-#define ERR_501 std::string("errors/error501.html")
-#define ERR_505 std::string("errors/error505.html")
-
 
 std::map<int, std::string>	ARequest::errors = ARequest::initMap();
 

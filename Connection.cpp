@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Connection.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gpanico <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 13:54:29 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/04 14:16:03 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/11 15:38:03 by adi-stef         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ Connection::Connection(int fd, struct sockaddr *addr, socklen_t addrlen): fd(fd)
 }
 
 Connection::~Connection(void) {
-	DEBUG("Connection closed");
+	DEBUG(RED + "Connection closed" + RESET);
 	if (this->fd != -1)
 		close(this->fd);
 }
