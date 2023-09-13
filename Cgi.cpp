@@ -66,9 +66,11 @@ long	Cgi::timeout(int &wstatus) {
 
 	time = Utils::ft_gettime();
 	while (Utils::ft_gettime() - time < CGI_TIMEOUT) {
-		waitpid(pid, &wstatus, WNOHANG);
+		waitpid(this->pid, &wstatus, WNOHANG);
+		std::cout << RED << "pid_t: " << this->pid << RESET << std::endl;
 		if (WIFEXITED(wstatus)) {
 			wstatus = WEXITSTATUS(wstatus);
+			std::cout << GREEN << "wstatus: " << wstatus << RESET << std::endl;
 			time = -1;
 			break;
 		}
@@ -80,31 +82,52 @@ std::string	Cgi::execCgi(void) {
 	int							fds[2];
 	char						buff[1];
 	std::stringstream			output;
-	int							wstatus;
+	int							wstatus = 0;
 
 	DEBUG(PURPLE + "executing cgi" + RESET);
 	pipe(fds);
 	this->launchCgi(fds);
-	if (this->timeout(wstatus) != -1) {
+	long	time;
+
+	time = Utils::ft_gettime();
+	while (Utils::ft_gettime() - time < CGI_TIMEOUT) {
+		int wt = waitpid(this->pid, &wstatus, WNOHANG);
+		if (wt == -1) {
+			wstatus = 177;
+			break;
+		}
+		std::cout << RED << "waitpid(): " << wt << RESET << std::endl;
+		if (wt && WIFEXITED(wstatus)) {
+			wstatus = WEXITSTATUS(wstatus);
+			std::cout << GREEN << "wstatus: " << wstatus << RESET << std::endl;
+			time = -1;
+			break;
+		}
+	}
+	if (time != -1) {
 		DEBUG(RED + "Server error" + RESET);
 		this->errorCode = 500;
 	}
 	else if (!wstatus) {
+		DEBUG(RED + "nothing to report" + RESET);
 		while (read(fds[0], buff, 1) == 1)
 			output << *buff;
 		close(fds[0]);
 		return (output.str());
 	}
-	else if (wstatus == 177)
+	else if (wstatus == 177 || wstatus == 2) {
+		DEBUG(RED + "404" + RESET);
 		this->errorCode = 404;
-	else
+	}
+	else {
+		DEBUG(RED + "500" + RESET);
 		this->errorCode = 500;
+	}
 	//this->response = this->generateError(loc->getData().errPages);
 	return ("");
 }
 
-
-pid_t	Cgi::launchCgi(int *fds) {
+void	Cgi::launchCgi(int *fds) {
 	char	**argv;
 
 	this->pid = fork();
@@ -119,6 +142,9 @@ pid_t	Cgi::launchCgi(int *fds) {
 				argv[0] = strdup(this->path.substr(this->path.rfind("/") + 1).c_str());
 			argv[1] = NULL;
 			execve(this->path.c_str(), argv, this->newEnv);
+			this->deleteMat((void **) argv);
+			this->deleteMat((void **) this->newEnv);
+			exit(177);
 		}
 		argv = new char*[3];
 		argv[0] = strdup(this->cgi.type.c_str());
@@ -134,6 +160,6 @@ pid_t	Cgi::launchCgi(int *fds) {
 		this->deleteMat((void **) this->newEnv);
 		exit(177);
 	}
+	std::cout << RED << "pid_t: " << this->pid << RESET << std::endl;
 	close(fds[1]);
-	return (pid);
 }

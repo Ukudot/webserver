@@ -4,13 +4,13 @@ server
 {
     server_name             retourverslefutur.fr;
     listen                  8081;
-    root                    /home/gpanico/webserver;
-    upload                  /home/user42/Bureau/webserv/www/uploads;
+    root                    /nfs/homes/Desktop/gpanico/webserver;
+    upload                  /nfs/homes/user42/Bureau/webserv/www/uploads;
     cgi                     php  php-cgi_ubuntu;
     cgi                     bash  script;
     cgi                     python3  test.py;
     cgi                     exe  test.out;
-    cgi-bin                 /home/gpanico/webserver;
+    cgi-bin                 /nfs/homes/gpanico/Desktop/webserver;
     client_max_body_size    30;
     allow_methods           GET POST;
     index                   index.html;

@@ -22,7 +22,7 @@ class	Cgi {
 		void	formatEnv(std::string env);
 		void	deleteMat(void **mat);
 		long	timeout(int &wstatus);
-		pid_t	launchCgi(int *fds);
+		void	launchCgi(int *fds);
 
 
 	public:

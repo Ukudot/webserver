@@ -6,7 +6,7 @@
 /*   By: adi-stef <adi-stef@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 11:12:56 by gpanico           #+#    #+#             */
-/*   Updated: 2023/09/11 14:26:13 by gpanico          ###   ########.fr       */
+/*   Updated: 2023/09/13 09:37:10 by gpanico          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,7 @@ bool	GetRequest::cgi(TreeNode<t_node> *loc, std::string tmpPath) {
 	for (std::vector<t_cgi>::iterator ite = loc->getData().cgis.begin(); ite != loc->getData().cgis.end(); ite++) {
 		DEBUG(PURPLE + "cgiName: " + cgiName + RESET);
 		DEBUG(PURPLE + "tmpPath: " + tmpPath + RESET);
+		DEBUG(PURPLE + "path: " + this->path + RESET);
 		DEBUG(PURPLE + "eName: " + (*ite).eName + RESET);
 		//if ((*ite).eName == cgiName) {
 		cgiPos = this->path.find((*ite).eName);
@@ -124,6 +125,8 @@ bool	GetRequest::cgi(TreeNode<t_node> *loc, std::string tmpPath) {
 			cgi = new Cgi(loc, (*ite), this->env);
 			cgi->setPathInfo(this->path.substr((*ite).eName.length() + 1, this->path.find("?") - (*ite).eName.length()));
 			output = cgi->execCgi();
+			DEBUG(GREEN + "cgi output: " + output + RESET);
+			std::cout << GREEN << "cgi errorCode: " << cgi->getErrorCode() << RESET << std::endl;
 			if (output == "") {
 				this->errorCode = cgi->getErrorCode();
 				this->response = this->generateError(loc->getData().errPages);
