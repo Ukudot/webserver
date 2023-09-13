@@ -31,7 +31,6 @@ GetRequest	&GetRequest::operator=(GetRequest const &req) {
 	this->conn = req.conn;
 	this->type = req.type;
 	this->path = req.path;
-	this->pathInfo = req.pathInfo;
 	this->env = req.env;
 	this->host = req.host;
 	return (*this);
@@ -106,6 +105,8 @@ bool	GetRequest::reds(TreeNode<t_node> *config, TreeNode<t_node> *loc, std::stri
 bool	GetRequest::cgi(TreeNode<t_node> *loc, std::string tmpPath) {
 	std::string	cgiName;
 	size_t		cgiPos;
+	Cgi			*cgi;
+	std::string	output;
 
 	//cgiName = this->path.substr(this->path.rfind("/") + 1);
 	
@@ -118,116 +119,22 @@ bool	GetRequest::cgi(TreeNode<t_node> *loc, std::string tmpPath) {
 		std::cout << ">> cgiPos: " << cgiPos << std::endl;
 		if (cgiPos == 1) {
 			DEBUG(RED + "cgi found" + RESET);
-			this->pathInfo = this->path.substr((*ite).eName.length() + 1, this->path.find("?") - (*ite).eName.length());
 			DEBUG(RED + "cgi path: " + this->path + RESET);
-			DEBUG(RED + "cgi path info: " + this->pathInfo + RESET);
 			DEBUG(RED + "cgi string query: " + this->env + RESET);
-			this->execCgi(loc, (*ite), loc->getData().cgiBin + "/" + (*ite).eName);
+			cgi = new Cgi(loc, (*ite), this->env);
+			cgi->setPathInfo(this->path.substr((*ite).eName.length() + 1, this->path.find("?") - (*ite).eName.length()));
+			output = cgi->execCgi();
+			if (output == "") {
+				this->errorCode = cgi->getErrorCode();
+				this->response = this->generateError(loc->getData().errPages);
+			}
+			else {
+				this->response = this->generateHeader(output.length(), "") + output;
+
+			}
 			return (true);
 		}
 	}
 	DEBUG(RED + "cgi not found" + RESET);
 	return (false);
-}
-
-void	GetRequest::execCgi(TreeNode<t_node> *loc, t_cgi &cgi, std::string path) {
-	pid_t						pid;
-	int							fds[2];
-	char						buff[1];
-	std::stringstream			output;
-	int							wstatus;
-	long						time;
-
-	DEBUG(PURPLE + "executing cgi" + RESET);
-	pipe(fds);
-	pid = this->launchCgi(fds, cgi, path);
-	time = Utils::ft_gettime();
-	while (Utils::ft_gettime() - time < CGI_TIMEOUT) {
-		waitpid(pid, &wstatus, WNOHANG);
-		if (WIFEXITED(wstatus)) {
-			wstatus = WEXITSTATUS(wstatus);
-			time = -1;
-			break;
-		}
-	}
-	if (time != -1) {
-		DEBUG(RED + "Server error" + RESET);
-		this->errorCode = 500;
-	}
-	else if (!wstatus) {
-		while (read(fds[0], buff, 1) == 1)
-			output << *buff;
-		close(fds[0]);
-		this->response = generateHeader(output.str().length(), "") + output.str();
-		return ;
-	}
-	else if (wstatus == 177)
-		this->errorCode = 404;
-	else
-		this->errorCode = 500;
-	this->response = this->generateError(loc->getData().errPages);
-}
-
-char	**GetRequest::updateEnvp(void) {
-	char						**envp;
-	std::vector<std::string>	splittedEnv;
-	size_t						i = 0;
-
-	splittedEnv = Utils::ft_split(this->env, "&");
-//	envp = new char*[splittedEnv.size() + Server::envp.size() + 1];
-	envp = new char*[Server::envp.size() + 3];
-	for (; i < Server::envp.size(); i++)
-		envp[i] = Server::envp[i];
-//	for (size_t j = 0; j < splittedEnv.size(); j++, i++)
-//		envp[i] = strdup(splittedEnv[j].c_str());
-//	envp[i] = strdup(splittedEnv[j].c_str());
-	envp[i] = strdup(std::string(std::string("QUERY_STRING=") + this->env).c_str()); // implement MACRO
-	envp[i + 1] = strdup(std::string(std::string("PATH_INFO=") + this->pathInfo).c_str()); // implement MACRO
-	envp[i + 2] = NULL;
-	return (envp);
-}
-
-void	GetRequest::deleteMat(void **mat) {
-	for (int i = 0; mat[i]; i++) {
-		free(mat[i]);
-	}
-	delete [] mat;
-}
-
-pid_t	GetRequest::launchCgi(int *fds, t_cgi &cgi, std::string path) {
-	pid_t						pid;
-	char						**argv;
-	char						**envp;
-
-	pid = fork();
-	if (!pid) {
-		dup2(fds[1], 1);
-		close(fds[0]);
-		envp = this->updateEnvp();
-		if (cgi.type == "exe") {
-			argv = new char*[2];
-			if (path.rfind("/") == NPOS)
-				argv[0] = strdup(path.c_str());
-			else
-				argv[0] = strdup(path.substr(path.rfind("/") + 1).c_str());
-			argv[1] = NULL;
-			execve(path.c_str(), argv, envp);
-			exit(10);
-		}
-		argv = new char*[3];
-		argv[0] = strdup(cgi.type.c_str());
-		argv[1] = strdup(path.c_str());
-		argv[2] = NULL;
-		if (cgi.type == "bash")
-			execve(BASH, argv, envp);
-		else if (cgi.type == "php")
-			execve(PHP, argv, envp);
-		else
-			execve(PYTHON, argv, envp);
-		this->deleteMat((void **) argv);
-		this->deleteMat((void **) envp);
-		exit(177);
-	}
-	close(fds[1]);
-	return (pid);
 }

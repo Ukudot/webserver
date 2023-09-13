@@ -16,6 +16,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include "ARequest.hpp"
+#include "Cgi.hpp"
 #include "Server.hpp"
 
 class	GetRequest: public ARequest {
@@ -24,9 +25,6 @@ class	GetRequest: public ARequest {
 		char	**updateEnvp(void);
 		bool	reds(TreeNode<t_node> *config, TreeNode<t_node> *loc, std::string tmpPath);
 		bool	cgi(TreeNode<t_node> *loc, std::string tmpPath);
-		void	execCgi(TreeNode<t_node> *loc, t_cgi &cgi, std::string path);
-		pid_t	launchCgi(int *fds, t_cgi &cgi, std::string path);
-		void	deleteMat(void **mat);
 
 	public:
 
