@@ -13,7 +13,7 @@
 NAME		= webserv
 # files
 SRC		= main.cpp ServSocket.cpp Utils.cpp Connection.cpp Server.cpp Tokenizer.cpp \
-		  Parser.cpp ARequest.cpp GetRequest.cpp
+		  Parser.cpp ARequest.cpp GetRequest.cpp Cgi.cpp
 OBJ		= $(SRC:%.cpp=%.o)
 
 CC		= c++

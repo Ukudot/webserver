@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <ctime>
 #include "ARequest.hpp"
+#include "Cgi.hpp"
 #include "Server.hpp"
 
 #define CGI_TIMEOUT 1
@@ -56,9 +57,6 @@ class	GetRequest: public ARequest {
 		char	**updateEnvp(void);
 		bool	reds(TreeNode<t_node> *config, TreeNode<t_node> *loc, std::string tmpPath);
 		bool	cgi(TreeNode<t_node> *loc, std::string tmpPath);
-		void	execCgi(TreeNode<t_node> *loc, t_cgi &cgi, std::string path);
-		pid_t	launchCgi(int *fds, t_cgi &cgi, std::string path);
-		void	deleteMat(void **mat);
 
 		static bool	cmp(t_file const &f1, t_file const &f2);
 		static bool	getFileInfo(std::string path, t_file &file);
